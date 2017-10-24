@@ -1,4 +1,4 @@
-package net.corda.examples.fx.buyer_app.web.server
+package net.corda.examples.fx.buyer_app
 
 import com.github.salomonbrys.kotson.double
 import com.github.salomonbrys.kotson.jsonObject

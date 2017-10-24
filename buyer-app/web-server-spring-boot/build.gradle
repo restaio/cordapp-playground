@@ -1,4 +1,20 @@
+buildscript {
+    ext.spring_boot_version = '1.5.7.RELEASE'
+    ext.spring_version = '4.3.11.RELEASE'
+    ext.kotson_version = '2.5.0'
+}
+
 dependencies {
+    cordapp project(':buyer-app:domain')
+    cordapp project(':buyer-app:corda-fx-adapter')
+    cordapp project(':buyer-app:service')
+    cordapp project(':buyer')
+
+    compile "org.springframework.boot:spring-boot:$spring_boot_version"
+    compile "org.springframework.boot:spring-boot-autoconfigure:$spring_boot_version"
+    compile "org.springframework.boot:spring-boot-starter-log4j2:$spring_boot_version"
+    compile "com.github.salomonbrys.kotson:kotson:$kotson_version"
+
     cordapp project(':buyer-app:web-server-common')
 
     compile("org.springframework.boot:spring-boot-starter-web:$spring_boot_version") {

@@ -1,11 +1,10 @@
-package net.corda.examples.fx.buyer_app.web.server.spring.boot
+package net.corda.examples.fx.buyer_app
 
 import com.github.salomonbrys.kotson.jsonObject
 import com.github.salomonbrys.kotson.string
 import com.google.gson.JsonObject
 import net.corda.core.utilities.loggerFor
 import net.corda.examples.fx.buyer_app.service.FXService
-import net.corda.examples.fx.buyer_app.web.server.BuyerServer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,7 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+// Means the controller will be picked up by component-scanning.
 @RestController
+// Defines the base path for the individual paths below.
+@RequestMapping("/api")
+// @Autowired means the constructor will have a dependency injected automatically.
 private class CustomerController @Autowired constructor(private val service: FXService) : BuyerServer() {
 
     companion object {
