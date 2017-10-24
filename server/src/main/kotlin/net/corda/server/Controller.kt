@@ -20,7 +20,7 @@ private val SERVICE_NAMES = listOf("Controller")
 
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
-private class RestController(@Autowired private val rpc: NodeRPCConnection) {
+private class RestController(private val rpc: NodeRPCConnection) {
     private val myName = rpc.proxy.nodeInfo().legalIdentities.first().name
 
     companion object {
@@ -74,7 +74,7 @@ private class RestController(@Autowired private val rpc: NodeRPCConnection) {
 
 @Controller
 @MessageMapping("/stomp")
-private class StompController(@Autowired private val rpc: NodeRPCConnection, @Autowired private val template: SimpMessagingTemplate) {
+private class StompController(private val rpc: NodeRPCConnection, private val template: SimpMessagingTemplate) {
     companion object {
         private val logger = LoggerFactory.getLogger(StompController::class.java)
     }
