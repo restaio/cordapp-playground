@@ -73,6 +73,7 @@ private class RestController(@Autowired private val rpc: NodeRPCConnection) {
 }
 
 @Controller
+@MessageMapping("/stomp")
 private class StompController(@Autowired private val rpc: NodeRPCConnection, @Autowired private val template: SimpMessagingTemplate) {
     companion object {
         private val logger = LoggerFactory.getLogger(StompController::class.java)
@@ -81,7 +82,7 @@ private class StompController(@Autowired private val rpc: NodeRPCConnection, @Au
     /**
      *  An example endpoint for responding to STOMP messages.
      */
-    @MessageMapping("/stompEndpoint")
+    @MessageMapping("/streamYos")
     private fun stompEndpoint() {
         val (_, updates) = rpc.proxy.vaultTrack(YoState::class.java)
         updates.subscribe { update ->
