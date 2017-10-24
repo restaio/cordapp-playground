@@ -11,6 +11,9 @@ private const val CORDA_USER_PASSWORD = "config.rpc.password"
 private const val CORDA_NODE_HOST = "config.rpc.host"
 private const val CORDA_NODE_RPC_PORT = "config.rpc.port"
 
+/**
+ * Provides access to the node via RPC, using the properties in `application.properties`.
+ */
 @Configuration
 open class NodeRPCConnection(
         @Value("\${$CORDA_NODE_HOST}") private val host: String,
