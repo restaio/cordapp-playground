@@ -1,19 +1,11 @@
 package net.corda.server
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
-import net.corda.webserver.converters.CordaX500NameConverter
 import net.corda.yo.YoFlow
 import net.corda.yo.YoState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.json.GsonJsonParser
-import org.springframework.boot.json.JacksonJsonParser
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -24,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
-val SERVICE_NAMES = listOf("Controller")
+private val SERVICE_NAMES = listOf("Controller")
 
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
