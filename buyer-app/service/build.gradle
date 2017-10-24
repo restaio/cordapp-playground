@@ -1,7 +1,0 @@
-dependencies {
-    // normally this would only reference the domain sub-project (but we're using packages here not to nest too much)
-    cordapp project(':buyer-app:domain')
-    cordapp project(':buyer-app:logging')
-
-    compile"org.springframework:spring-context:$spring_version"
-}
