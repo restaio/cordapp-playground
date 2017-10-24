@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Bean
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
+
+
 
 private const val HTTP_PORT = "config.http.port"
 
@@ -23,12 +28,22 @@ private open class Server {
     }
 
     /**
-     * Registers an endpoint for STOMP messages.
+     * Registers an endpoint for STOMP messages, disabling CORS.
      */
     @EnableWebSocketMessageBroker
     open class WebSocketConfig : AbstractWebSocketMessageBrokerConfigurer() {
         override fun registerStompEndpoints(registry: StompEndpointRegistry) {
             registry.addEndpoint("/stomp").setAllowedOrigins("*").withSockJS()
+        }
+    }
+
+    /**
+     * Disables CORS for REST.
+     */
+    @EnableWebMvc
+    open class WebConfig : WebMvcConfigurerAdapter() {
+        override fun addCorsMappings(registry: CorsRegistry?) {
+            registry!!.addMapping("/**")
         }
     }
 }
