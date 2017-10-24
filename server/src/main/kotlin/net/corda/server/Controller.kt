@@ -1,5 +1,7 @@
 package net.corda.server
 
+import net.corda.yo.YoFlow
+import net.corda.yo.YoState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -10,10 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.HttpServletRequest
 
 
 @RestController
-@RequestMapping("/example") // The paths for GET and POST requests are relative to this base path.
+@RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
 private class RestController(@Autowired private val rpc: NodeRPCConnection) {
     companion object {
         private val logger = LoggerFactory.getLogger(RestController::class.java)
@@ -22,17 +25,19 @@ private class RestController(@Autowired private val rpc: NodeRPCConnection) {
     /**
      *  An example GET endpoint.
      */
-    @GetMapping(value = "/getEndpoint", produces= arrayOf("text/plain"))
-    private fun getEndpoint(): ResponseEntity<String> {
-        return ResponseEntity.ok("GET endpoint.")
-    }
+    @GetMapping(value = "/yos", produces = arrayOf("text/plain"))
+    private fun yos() = ResponseEntity.ok(rpc.proxy.vaultQuery(YoState::class.java).states.toString())
 
     /**
      *  An example POST endpoint.
      */
-    @PostMapping(value = "/postEndpoint", produces= arrayOf("text/plain"))
-    private fun postEndpoint(): ResponseEntity<String> {
-        return ResponseEntity.ok("POST endpoint.")
+    @PostMapping(value = "/yo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    private fun yo(request: HttpServletRequest): ResponseEntity<String> {
+        val targetName = request.getParameter("target")
+        val target = rpc.proxy.partiesFromName(targetName, false).iterator().next()
+        val flowHandle = rpc.proxy.startFlowDynamic(YoFlow::class.java, target)
+        flowHandle.returnValue.get()
+        return ResponseEntity.ok("You just sent a Yo! to ${target.name}")
     }
 }
 
@@ -47,11 +52,12 @@ private class StompController(@Autowired private val rpc: NodeRPCConnection, @Au
      */
     @MessageMapping("/stompEndpoint")
     private fun stompEndpoint() {
-        while (true) {
-            val states = rpc.proxy.nodeInfo().legalIdentities.first().toString()
-            logger.info(states)
-            template.convertAndSend("/stompResponse", states, mapOf("content-type" to "text/plain"))
-            Thread.sleep(1000)
+        val (snapshot, updates) = rpc.proxy.vaultTrack(YoState::class.java)
+        updates.subscribe { update ->
+            update.produced.forEach {
+                logger.info(it.toString())
+                template.convertAndSend("/stompResponse", it.toString(), mapOf("content-type" to "text/plain"))
+            }
         }
     }
 }

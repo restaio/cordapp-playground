@@ -13,6 +13,8 @@
       <module name="corda-foreign-exchange-example_test" target="1.8" />
       <module name="corda-fx-adapter_main" target="1.8" />
       <module name="corda-fx-adapter_test" target="1.8" />
+      <module name="cordapp_main" target="1.8" />
+      <module name="cordapp_test" target="1.8" />
       <module name="domain_main" target="1.8" />
       <module name="domain_test" target="1.8" />
       <module name="logging_main" target="1.8" />
