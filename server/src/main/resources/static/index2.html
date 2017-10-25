@@ -78,15 +78,11 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
         </div>
         <div ng-show="demoApp.yos.length" class="panel panel-primary">
             <div class="panel-heading">
-                <h3 class="panel-title">Recorded Yo's:</h3>
+                <h3 class="panel-title">Recorded Yo's</h3>
             </div>
-        </div>
-        <div ng-repeat="yo in demoApp.yos" class="panel panel-default">
             <div class="panel-body">
                 <ul>
-                    <li>Origin: {{yo.origin}}</li>
-                    <li>Target: {{yo.target}}</li>
-                    <li>Text: {{yo.yo}}</li>
+                    <li ng-repeat="yo in demoApp.yos">{{yo.origin}} said: <b>{{yo.yo}}</b></li>
                 </ul>
             </div>
         </div>

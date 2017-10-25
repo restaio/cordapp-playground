@@ -48,7 +48,7 @@ app.controller('DemoAppController', function($http, $location, $uibModal) {
         modalInstance.result.then(() => {}, () => {});
     };
 
-    demoApp.getYos = () => $http.get(apiBaseURL + "yos")
+    demoApp.getYos = () => $http.get(`${apiBaseURL}getYos`)
         .then((response) => demoApp.yos = Object.keys(response.data)
             .map((key) => response.data[key])
             .reverse());
@@ -72,7 +72,7 @@ app.controller('ModalInstanceCtrl', function ($http, $location, $uibModalInstanc
 
             $uibModalInstance.close();
 
-            const sendYoEndpoint = `${apiBaseURL}yo`;
+            const sendYoEndpoint = `${apiBaseURL}sendYo`;
             const sendYoData = $.param({
                 target: modalInstance.form.target
             });

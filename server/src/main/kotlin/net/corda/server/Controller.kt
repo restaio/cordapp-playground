@@ -5,7 +5,7 @@ import net.corda.core.messaging.vaultQueryBy
 import net.corda.yo.YoFlow
 import net.corda.yo.YoState
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -16,11 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
-private val SERVICE_NAMES = listOf("Controller")
+private const val CONTROLLER_NAME = "config.controller.name"
 
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
-private class RestController(private val rpc: NodeRPCConnection) {
+private class RestController(
+        private val rpc: NodeRPCConnection,
+        @Value("\${$CONTROLLER_NAME}") private val controllerName: String) {
+
     private val myName = rpc.proxy.nodeInfo().legalIdentities.first().name
 
     companion object {
@@ -34,7 +37,7 @@ private class RestController(private val rpc: NodeRPCConnection) {
     private fun me() = myName.toString()
 
     /**
-     *  Returns my peers.
+     *  Returns a list of the network peers.
      */
     @GetMapping(value = "/peers", produces = arrayOf("application/json"))
     private fun peers(): Map<String, List<String>> {
@@ -43,22 +46,21 @@ private class RestController(private val rpc: NodeRPCConnection) {
                 .map { it.legalIdentities.first().name }
                 // Filter myself and the controller out of the list of peers.
                 // TODO: Re-add filtering out of our node (` + myName.organisation`).
-                .filter { it.organisation !in (SERVICE_NAMES) }
+                .filter { it.organisation != controllerName }
                 .map { it.toString() })
     }
 
     /**
      *  Returns a list of existing Yo's.
      */
-    @GetMapping(value = "/yos", produces = arrayOf("application/json"))
-    // TODO: Return as JSON object
-    private fun yos() = rpc.proxy.vaultQueryBy<YoState>().states.map { it.state.data.toJson() }
+    @GetMapping(value = "/getYos", produces = arrayOf("application/json"))
+    private fun getYos() = rpc.proxy.vaultQueryBy<YoState>().states.map { it.state.data.toJson() }
 
     /**
-     *  An example POST endpoint.
+     *  Sends a Yo to a counterparty.
      */
-    @PostMapping(value = "/yo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
-    private fun yo(request: HttpServletRequest): ResponseEntity<String> {
+    @PostMapping(value = "/sendYo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    private fun sendYo(request: HttpServletRequest): ResponseEntity<String> {
         val targetName = request.getParameter("target")
         val targetX500Name = CordaX500Name.parse(targetName)
         val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name) ?: throw IllegalArgumentException("Unrecognised peer.")
@@ -67,8 +69,11 @@ private class RestController(private val rpc: NodeRPCConnection) {
         return ResponseEntity.ok("You just sent a Yo! to ${target.name}")
     }
 
+    /**
+     *  Maps a YoState to a JSON object.
+     */
     private fun YoState.toJson(): Map<String, String> {
-        return mapOf("origin" to origin.toString(), "target" to target.toString(), "yo" to yo)
+        return mapOf("origin" to origin.name.organisation, "target" to target.name.toString(), "yo" to yo)
     }
 }
 
