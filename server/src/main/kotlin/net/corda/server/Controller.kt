@@ -88,7 +88,7 @@ private class StompController(private val rpc: NodeRPCConnection, private val te
      *  An example endpoint for responding to STOMP messages.
      */
     @MessageMapping("/streamYos")
-    private fun stompEndpoint() {
+    private fun streamYos() {
         val (_, updates) = rpc.proxy.vaultTrack(YoState::class.java)
         updates.subscribe { update ->
             update.produced.forEach {
