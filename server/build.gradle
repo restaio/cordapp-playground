@@ -10,6 +10,7 @@ repositories {
     maven { url 'https://dl.bintray.com/kotlin/exposed' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
+    flatDir { dirs '../lib' }
 }
 
 apply plugin: 'kotlin'
@@ -51,7 +52,7 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-web:2.7"
 
     // The Yo CorDapp.
-    cordapp project(":cordapp")
+    cordapp name: "yo-4"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -71,14 +72,14 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         advertisedServices = ["corda.notary.validating"]
         p2pPort 10002
         rpcPort 10003
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
+        cordapps = [":yo-4:"]
     }
     node {
         name "O=PartyA,L=London,C=GB"
         advertisedServices = []
         p2pPort 10005
         rpcPort 10006
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
+        cordapps = [":yo-4:"]
         rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.net.corda.yo.YoFlow"]]]
     }
     node {
@@ -86,7 +87,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         advertisedServices = []
         p2pPort 10008
         rpcPort 10009
-        cordapps = ["net.corda:corda-finance:$corda_release_version"]
+        cordapps = [":yo-4:"]
         rpcUsers = [[ user: "user1", "password": "test", "permissions": ["StartFlow.net.corda.yo.YoFlow"]]]
     }
 }
