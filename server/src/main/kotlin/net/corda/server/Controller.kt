@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletRequest
 
 private const val CONTROLLER_NAME = "config.controller.name"
 
+/**
+ *  A controller for REST calls.
+ */
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
 private class RestController(
@@ -31,41 +34,42 @@ private class RestController(
     }
 
     /**
-     *  Returns my name.
+     *  Returns the node's name.
      */
     @GetMapping(value = "/me", produces = arrayOf("text/plain"))
     private fun me() = myName.toString()
 
     /**
-     *  Returns a list of the network peers.
+     *  Returns a list of the node's network peers.
      */
     @GetMapping(value = "/peers", produces = arrayOf("application/json"))
     private fun peers(): Map<String, List<String>> {
-        val nodeInfo = rpc.proxy.networkMapSnapshot()
-        return mapOf("peers" to nodeInfo
-                .map { it.legalIdentities.first().name }
-                // Filter myself and the controller out of the list of peers.
-                // TODO: Re-add filtering out of our node (` + myName.organisation`).
-                .filter { it.organisation != controllerName }
-                .map { it.toString() })
+        val nodes = rpc.proxy.networkMapSnapshot()
+        val nodeNames = nodes.map { it.legalIdentities.first().name }
+        val filteredNodeNames = nodeNames.filter { it.organisation !in listOf(controllerName, myName) }
+        val filteredNodeNamesToStr = filteredNodeNames.map { it.toString() }
+        return mapOf("peers" to filteredNodeNamesToStr)
     }
 
     /**
      *  Returns a list of existing Yo's.
      */
-    @GetMapping(value = "/getYos", produces = arrayOf("application/json"))
-    private fun getYos() = rpc.proxy.vaultQueryBy<YoState>().states.map { it.state.data.toJson() }
+    @GetMapping(value = "/getyos", produces = arrayOf("application/json"))
+    private fun getYos(): List<Map<String, String>> {
+        val yoStateAndRefs = rpc.proxy.vaultQueryBy<YoState>().states
+        val yoStates = yoStateAndRefs.map { it.state.data }
+        return yoStates.map { it.toJson() }
+    }
 
     /**
      *  Sends a Yo to a counterparty.
      */
-    @PostMapping(value = "/sendYo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    @PostMapping(value = "/sendyo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
     private fun sendYo(request: HttpServletRequest): ResponseEntity<String> {
         val targetName = request.getParameter("target")
         val targetX500Name = CordaX500Name.parse(targetName)
         val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name) ?: throw IllegalArgumentException("Unrecognised peer.")
-        val flowHandle = rpc.proxy.startFlowDynamic(YoFlow::class.java, target)
-        flowHandle.returnValue.get()
+        rpc.proxy.startFlowDynamic(YoFlow::class.java, target).returnValue.get()
         return ResponseEntity.ok("You just sent a Yo! to ${target.name}")
     }
 
@@ -77,23 +81,27 @@ private class RestController(
     }
 }
 
+/**
+ *  A controller for websocket messages.
+ */
 @Controller
-@MessageMapping("/stomp")
+@MessageMapping("/stomp") // The paths for STOMP messages are relative to this base path.
 private class StompController(private val rpc: NodeRPCConnection, private val template: SimpMessagingTemplate) {
     companion object {
         private val logger = LoggerFactory.getLogger(StompController::class.java)
     }
 
     /**
-     *  An example endpoint for responding to STOMP messages.
+     *  Starts streaming notifications for new Yo's over a websocket.
      */
     @MessageMapping("/streamYos")
     private fun streamYos() {
-        val (_, updates) = rpc.proxy.vaultTrack(YoState::class.java)
-        updates.subscribe { update ->
+        val (_, observable) = rpc.proxy.vaultTrack(YoState::class.java)
+        observable.subscribe { update ->
             update.produced.forEach {
-                logger.info(it.toString())
-                template.convertAndSend("/stompResponse", it.toString(), mapOf("content-type" to "text/plain"))
+                // Hitting the stompResponse endpoint simply causes the node to reload its list of
+                // Yo's from the GET endpoint. We therefore leave the payload empty.
+                template.convertAndSend("/stompResponse", "")
             }
         }
     }

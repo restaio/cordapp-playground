@@ -2,7 +2,7 @@
 
 const app = angular.module("yoAppModule", ["ui.bootstrap"]);
 
-// Fix for unhandled rejections bug.
+// Intercepts unhandled-rejection errors.
 app.config(["$qProvider", function ($qProvider) {
     $qProvider.errorOnUnhandledRejections(false);
 }]);
