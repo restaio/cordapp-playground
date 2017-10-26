@@ -1,7 +1,9 @@
 package net.corda.server
 
+import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
+import net.corda.core.utilities.getOrThrow
 import net.corda.yo.YoFlow
 import net.corda.yo.YoState
 import org.slf4j.LoggerFactory
@@ -69,8 +71,14 @@ private class RestController(
         val targetName = request.getParameter("target")
         val targetX500Name = CordaX500Name.parse(targetName)
         val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name) ?: throw IllegalArgumentException("Unrecognised peer.")
-        rpc.proxy.startFlowDynamic(YoFlow::class.java, target).returnValue.get()
-        return ResponseEntity.ok("You just sent a Yo! to ${target.name}")
+        val flow = rpc.proxy.startFlowDynamic(YoFlow::class.java, target)
+
+        return try {
+            flow.returnValue.getOrThrow()
+            ResponseEntity.ok("You just sent a Yo! to ${target.name}")
+        } catch (e: TransactionVerificationException.ContractRejection) {
+            ResponseEntity.badRequest().body("The Yo! was invalid - ${e.cause?.message}")
+        }
     }
 
     /**
