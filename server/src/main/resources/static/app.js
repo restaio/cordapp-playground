@@ -30,8 +30,8 @@ app.controller("YoAppController", function($http, $location, $uibModal) {
         let socket = new SockJS("/stomp");
         let stompClient = Stomp.over(socket);
         stompClient.connect({}, function startStreamingYos(frame) {
-            stompClient.send("/stomp/streamYos", {}, "");
-            stompClient.subscribe("/stompResponse", getYos);
+            stompClient.send("/stomp/streamyos", {}, "");
+            stompClient.subscribe("/stompresponse", getYos);
         });
     })();
 
@@ -49,7 +49,7 @@ app.controller("YoAppController", function($http, $location, $uibModal) {
     };
 
     function getYos() {
-        $http.get(`${apiBasePath}/getYos`)
+        $http.get(`${apiBasePath}/getyos`)
             .then(function processYos(response) {
                 let yos = Object.keys(response.data)
                     .map((key) => response.data[key])
@@ -77,7 +77,7 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
 
             $uibModalInstance.close();
 
-            let sendYoEndpoint = `${apiBasePath}/sendYo`;
+            let sendYoEndpoint = `${apiBasePath}/sendyo`;
             let sendYoData = $.param({
                 target: modalInstance.form.target
             });

@@ -1,6 +1,7 @@
 package net.corda.server
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.Banner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -20,9 +21,9 @@ private const val HTTP_PORT = "config.http.port"
 private open class Starter {
     /** Configures the port the servlet runs on. */
     @Configuration
-    open class ServletConfig(@Value("\${$HTTP_PORT}") val httpPort: Int) : EmbeddedServletContainerCustomizer {
+    open class ServletConfig(val appArgs: ApplicationArguments) : EmbeddedServletContainerCustomizer {
         override fun customize(container: ConfigurableEmbeddedServletContainer?) {
-            container?.setPort(httpPort)
+            container?.setPort(appArgs.sourceArgs[0].toInt())
         }
     }
 

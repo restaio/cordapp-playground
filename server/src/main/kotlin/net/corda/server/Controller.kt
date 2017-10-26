@@ -94,14 +94,14 @@ private class StompController(private val rpc: NodeRPCConnection, private val te
     /**
      *  Starts streaming notifications for new Yo's over a websocket.
      */
-    @MessageMapping("/streamYos")
+    @MessageMapping("/streamyos")
     private fun streamYos() {
         val (_, observable) = rpc.proxy.vaultTrack(YoState::class.java)
         observable.subscribe { update ->
             update.produced.forEach {
                 // Hitting the stompResponse endpoint simply causes the node to reload its list of
                 // Yo's from the GET endpoint. We therefore leave the payload empty.
-                template.convertAndSend("/stompResponse", "")
+                template.convertAndSend("/stompresponse", "")
             }
         }
     }
