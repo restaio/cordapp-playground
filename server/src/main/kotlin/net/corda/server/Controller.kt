@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
+
 private const val CONTROLLER_NAME = "config.controller.name"
 
 /**
@@ -63,6 +64,8 @@ private class RestController(
         return yoStates.map { it.toJson() }
     }
 
+    // TODO: Do I need both of these headers, below?
+
     /**
      *  Sends a Yo to a counterparty.
      */
@@ -79,13 +82,6 @@ private class RestController(
         } catch (e: TransactionVerificationException.ContractRejection) {
             ResponseEntity.badRequest().body("The Yo! was invalid - ${e.cause?.message}")
         }
-    }
-
-    /**
-     *  Maps a YoState to a JSON object.
-     */
-    private fun YoState.toJson(): Map<String, String> {
-        return mapOf("origin" to origin.name.organisation, "target" to target.name.toString(), "yo" to yo)
     }
 }
 
@@ -106,11 +102,19 @@ private class StompController(private val rpc: NodeRPCConnection, private val te
     private fun streamYos() {
         val (_, observable) = rpc.proxy.vaultTrack(YoState::class.java)
         observable.subscribe { update ->
-            update.produced.forEach {
+            update.produced.forEach { (state) ->
+                val yoStateJson = state.data.toJson()
                 // Hitting the stompResponse endpoint simply causes the node to reload its list of
                 // Yo's from the GET endpoint. We therefore leave the payload empty.
-                template.convertAndSend("/stompresponse", "")
+                template.convertAndSend("/stompresponse", yoStateJson)
             }
         }
     }
+}
+
+/**
+ *  Maps a YoState to a JSON object.
+ */
+private fun YoState.toJson(): Map<String, String> {
+    return mapOf("origin" to origin.name.organisation, "target" to target.name.toString(), "yo" to yo)
 }

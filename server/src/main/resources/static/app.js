@@ -1,83 +1,90 @@
 "use strict";
 
-const app = angular.module("yoAppModule", ["ui.bootstrap"]);
+const REST_BASE_PATH = "/yo";
+const GET_ME_PATH = `${REST_BASE_PATH}/me`;
+const GET_PEERS_PATH = `${REST_BASE_PATH}/peers`;
+const GET_YOS_PATH = `${REST_BASE_PATH}/getyos`;
+const SEND_YO_PATH = `${REST_BASE_PATH}/sendyo`;
+const STOMP_BASE_PATH = "/stomp";
+const STREAM_YOS_PATH = `${STOMP_BASE_PATH}/streamyos`;
 
-// Intercepts unhandled-rejection errors.
-app.config(["$qProvider", function ($qProvider) {
-    $qProvider.errorOnUnhandledRejections(false);
-}]);
+const app = angular.module("yoAppModule", ["ui.bootstrap"]);
 
 app.controller("YoAppController", function($http, $location, $uibModal) {
     const yoApp = this;
-    const apiBasePath = "/yo";
 
+    // Retrieves my identity.
     (function retrieveMe() {
-        $http.get(`${apiBasePath}/me`)
+        $http.get(GET_ME_PATH)
             .then(function storeMe(response) {
                 yoApp.me = response.data;
             })
     })();
 
+    // Retrieves a list of network peers.
     let peers = [];
     (function retrievePeers() {
-        $http.get(`${apiBasePath}/peers`)
+        $http.get(GET_PEERS_PATH)
             .then(function storePeers(response) {
                 peers = response.data.peers;
             })
     })();
 
+    // Starts streaming new Yo's from the websocket.
     (function connectAndStartStreamingYos() {
-        let socket = new SockJS("/stomp");
+        let socket = new SockJS(STOMP_BASE_PATH);
         let stompClient = Stomp.over(socket);
         stompClient.connect({}, function startStreamingYos(frame) {
-            stompClient.send("/stomp/streamyos", {}, "");
-            stompClient.subscribe("/stompresponse", getYos);
+            stompClient.send(STREAM_YOS_PATH, {}, "");
+            stompClient.subscribe("/stompresponse", function updateYos(update) {
+                let yoState = JSON.parse(update.body);
+                yoApp.yos.push(yoState)
+            });
         });
     })();
 
+    // Opens the send-Yo modal.
     yoApp.openSendYoModal = function openSendYoModal() {
         $uibModal.open({
             templateUrl: "yoAppModal.html",
             controller: "SendYoModalController",
             controllerAs: "sendYoModal",
             resolve: {
-                yoApp: () => yoApp,
-                apiBasePath: () => apiBasePath,
                 peers: () => peers
             }
         });
     };
 
+    // Gets a list of existing Yo's.
     function getYos() {
-        $http.get(`${apiBasePath}/getyos`)
+        $http.get(GET_YOS_PATH)
             .then(function processYos(response) {
                 let yos = Object.keys(response.data)
-                    .map((key) => response.data[key])
-                    .reverse();
+                    .map((key) => response.data[key]);
                 yoApp.yos = yos;
             });
     }
 
+    // Pre-populate the list of Yo's.
     getYos();
 });
 
-app.controller("SendYoModalController", function ($http, $location, $uibModalInstance, $uibModal, yoApp, apiBasePath, peers) {
+// Controller for send-yo modal.
+app.controller("SendYoModalController", function ($http, $location, $uibModalInstance, $uibModal, peers) {
     const modalInstance = this;
     modalInstance.peers = peers;
     modalInstance.form = {};
     modalInstance.formError = false;
 
-    // Validate and send Yo.
-    modalInstance.create = () => {
+    // Validates and sends Yo.
+    modalInstance.create = function validateAndSendYo() {
         if (isFormInvalid()) {
             modalInstance.formError = true;
 
         } else {
             modalInstance.formError = false;
-
             $uibModalInstance.close();
 
-            let sendYoEndpoint = `${apiBasePath}/sendyo`;
             let sendYoData = $.param({
                 target: modalInstance.form.target
             });
@@ -87,15 +94,16 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
                 }
             };
 
-            // Send Yo and handle success / fail responses.
-            $http.post(sendYoEndpoint, sendYoData, sendYoHeaders).then(
+            // Sends Yo and handles success / fail responses.
+            $http.post(SEND_YO_PATH, sendYoData, sendYoHeaders).then(
                 modalInstance.displayMessage,
                 modalInstance.displayMessage
             );
         }
     };
 
-    modalInstance.displayMessage = (message) => {
+    // Display result message from sending Yo.
+    modalInstance.displayMessage = function displayMessage(message) {
         $uibModal.open({
             templateUrl: "messageContent.html",
             controller: "ShowMessageController",
@@ -104,10 +112,10 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
         });
     };
 
-    // Close send Yo modal.
+    // Closes the send-Yo modal.
     modalInstance.cancel = $uibModalInstance.dismiss;
 
-    // Validates the Yo.
+    // Validates the Yo before sending.
     function isFormInvalid() {
         return modalInstance.form.target === undefined;
     }
@@ -118,3 +126,8 @@ app.controller('ShowMessageController', function ($uibModalInstance, message) {
     const modalInstanceTwo = this;
     modalInstanceTwo.message = message.data;
 });
+
+// Intercepts unhandled-rejection errors.
+app.config(["$qProvider", function ($qProvider) {
+    $qProvider.errorOnUnhandledRejections(false);
+}]);
