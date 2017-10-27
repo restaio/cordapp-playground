@@ -9,9 +9,7 @@ import net.corda.yo.YoState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
-import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,31 +20,43 @@ import javax.servlet.http.HttpServletRequest
 private const val CONTROLLER_NAME = "config.controller.name"
 
 /**
- *  A controller for REST calls.
+ *  A controller for interacting with the node via RPC.
  */
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
 private class RestController(
         private val rpc: NodeRPCConnection,
+        private val template: SimpMessagingTemplate,
         @Value("\${$CONTROLLER_NAME}") private val controllerName: String) {
-
-    private val myName = rpc.proxy.nodeInfo().legalIdentities.first().name
 
     companion object {
         private val logger = LoggerFactory.getLogger(RestController::class.java)
     }
 
-    /**
-     *  Returns the node's name.
-     */
-    @GetMapping(value = "/me", produces = arrayOf("text/plain"))
-    private fun me() = myName.toString()
+    private val myName = rpc.proxy.nodeInfo().legalIdentities.first().name
 
-    /**
-     *  Returns a list of the node's network peers.
-     */
-    @GetMapping(value = "/peers", produces = arrayOf("application/json"))
-    private fun peers(): Map<String, List<String>> {
+    // Starts streaming new Yo states to the websocket.
+    init {
+        rpc.proxy.vaultTrack(YoState::class.java).updates.subscribe { update ->
+            update.produced.forEach { (state) ->
+                val yoStateJson = state.data.toJson()
+                template.convertAndSend("/stompresponse", yoStateJson)
+            }
+        }
+    }
+
+    /** Maps a YoState to a JSON object. */
+    private fun YoState.toJson(): Map<String, String> {
+        return mapOf("origin" to origin.name.organisation, "target" to target.name.toString(), "yo" to yo)
+    }
+
+    /** Returns the node's name. */
+    @GetMapping(value = "/myname", produces = arrayOf("text/plain"))
+    private fun myName() = myName.toString()
+
+    /** Returns a list of the node's network peers. */
+    @GetMapping(value = "/peersnames", produces = arrayOf("application/json"))
+    private fun peersNames(): Map<String, List<String>> {
         val nodes = rpc.proxy.networkMapSnapshot()
         val nodeNames = nodes.map { it.legalIdentities.first().name }
         val filteredNodeNames = nodeNames.filter { it.organisation !in listOf(controllerName, myName) }
@@ -54,9 +64,7 @@ private class RestController(
         return mapOf("peers" to filteredNodeNamesToStr)
     }
 
-    /**
-     *  Returns a list of existing Yo's.
-     */
+    /** Returns a list of existing Yo's. */
     @GetMapping(value = "/getyos", produces = arrayOf("application/json"))
     private fun getYos(): List<Map<String, String>> {
         val yoStateAndRefs = rpc.proxy.vaultQueryBy<YoState>().states
@@ -64,11 +72,7 @@ private class RestController(
         return yoStates.map { it.toJson() }
     }
 
-    // TODO: Do I need both of these headers, below?
-
-    /**
-     *  Sends a Yo to a counterparty.
-     */
+    /** Sends a Yo to a counterparty. */
     @PostMapping(value = "/sendyo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
     private fun sendYo(request: HttpServletRequest): ResponseEntity<String> {
         val targetName = request.getParameter("target")
@@ -83,38 +87,4 @@ private class RestController(
             ResponseEntity.badRequest().body("The Yo! was invalid - ${e.cause?.message}")
         }
     }
-}
-
-/**
- *  A controller for websocket messages.
- */
-@Controller
-@MessageMapping("/stomp") // The paths for STOMP messages are relative to this base path.
-private class StompController(private val rpc: NodeRPCConnection, private val template: SimpMessagingTemplate) {
-    companion object {
-        private val logger = LoggerFactory.getLogger(StompController::class.java)
-    }
-
-    /**
-     *  Starts streaming notifications for new Yo's over a websocket.
-     */
-    @MessageMapping("/streamyos")
-    private fun streamYos() {
-        val (_, observable) = rpc.proxy.vaultTrack(YoState::class.java)
-        observable.subscribe { update ->
-            update.produced.forEach { (state) ->
-                val yoStateJson = state.data.toJson()
-                // Hitting the stompResponse endpoint simply causes the node to reload its list of
-                // Yo's from the GET endpoint. We therefore leave the payload empty.
-                template.convertAndSend("/stompresponse", yoStateJson)
-            }
-        }
-    }
-}
-
-/**
- *  Maps a YoState to a JSON object.
- */
-private fun YoState.toJson(): Map<String, String> {
-    return mapOf("origin" to origin.name.organisation, "target" to target.name.toString(), "yo" to yo)
 }

@@ -1,17 +1,18 @@
 "use strict";
 
 const REST_BASE_PATH = "/yo";
-const GET_ME_PATH = `${REST_BASE_PATH}/me`;
-const GET_PEERS_PATH = `${REST_BASE_PATH}/peers`;
+const GET_ME_PATH = `${REST_BASE_PATH}/myname`;
+const GET_PEERS_PATH = `${REST_BASE_PATH}/peersnames`;
 const GET_YOS_PATH = `${REST_BASE_PATH}/getyos`;
 const SEND_YO_PATH = `${REST_BASE_PATH}/sendyo`;
-const STOMP_BASE_PATH = "/stomp";
-const STREAM_YOS_PATH = `${STOMP_BASE_PATH}/streamyos`;
+const STOMP_SUBSCRIBE_PATH = "/stomp";
+const STOMP_RESPONSE_PATH = "/stompresponse";
 
 const app = angular.module("yoAppModule", ["ui.bootstrap"]);
 
-app.controller("YoAppController", function($http, $location, $uibModal) {
+app.controller("YoAppController", function($scope, $http, $location, $uibModal) {
     const yoApp = this;
+    let peers = [];
 
     // Retrieves my identity.
     (function retrieveMe() {
@@ -22,7 +23,6 @@ app.controller("YoAppController", function($http, $location, $uibModal) {
     })();
 
     // Retrieves a list of network peers.
-    let peers = [];
     (function retrievePeers() {
         $http.get(GET_PEERS_PATH)
             .then(function storePeers(response) {
@@ -32,13 +32,14 @@ app.controller("YoAppController", function($http, $location, $uibModal) {
 
     // Starts streaming new Yo's from the websocket.
     (function connectAndStartStreamingYos() {
-        let socket = new SockJS(STOMP_BASE_PATH);
+        let socket = new SockJS(STOMP_SUBSCRIBE_PATH);
         let stompClient = Stomp.over(socket);
         stompClient.connect({}, function startStreamingYos(frame) {
-            stompClient.send(STREAM_YOS_PATH, {}, "");
-            stompClient.subscribe("/stompresponse", function updateYos(update) {
+            stompClient.subscribe(STOMP_RESPONSE_PATH, function updateYos(update) {
                 let yoState = JSON.parse(update.body);
-                yoApp.yos.push(yoState)
+                yoApp.yos.push(yoState);
+                // Forces the view to refresh, showing the new Yo.
+                $scope.$apply();
             });
         });
     })();
@@ -57,12 +58,11 @@ app.controller("YoAppController", function($http, $location, $uibModal) {
 
     // Gets a list of existing Yo's.
     function getYos() {
-        $http.get(GET_YOS_PATH)
-            .then(function processYos(response) {
-                let yos = Object.keys(response.data)
-                    .map((key) => response.data[key]);
-                yoApp.yos = yos;
-            });
+        $http.get(GET_YOS_PATH).then(function processYos(response) {
+            let yos = Object.keys(response.data)
+                .map((key) => response.data[key]);
+            yoApp.yos = yos;
+        });
     }
 
     // Pre-populate the list of Yo's.
