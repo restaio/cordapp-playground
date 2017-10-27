@@ -3,16 +3,13 @@ package net.corda.server
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.utilities.NetworkHostAndPort
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.ApplicationArguments
-import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
-
 
 private const val CORDA_USER_NAME = "config.rpc.username"
 private const val CORDA_USER_PASSWORD = "config.rpc.password"
 private const val CORDA_NODE_HOST = "config.rpc.host"
+private const val CORDA_RPC_PORT = "config.rpc.port"
 
 /**
  * Wraps a node RPC proxy.
@@ -30,12 +27,11 @@ open class NodeRPCConnection(
         @Value("\${$CORDA_NODE_HOST}") host: String,
         @Value("\${$CORDA_USER_NAME}") username: String,
         @Value("\${$CORDA_USER_PASSWORD}") password: String,
-        appArgs: ApplicationArguments) {
+        @Value("\${$CORDA_RPC_PORT}") rpcPort: Int) {
 
     val proxy: CordaRPCOps
 
     init {
-        val rpcPort = appArgs.sourceArgs[1].toInt()
         val rpcAddress = NetworkHostAndPort(host, rpcPort)
         val rpcClient = CordaRPCClient(rpcAddress)
         val rpcConnection = rpcClient.start(username, password)

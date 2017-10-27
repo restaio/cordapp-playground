@@ -35,6 +35,8 @@
       <module name="service_test" target="1.8" />
       <module name="shared_main" target="1.8" />
       <module name="shared_test" target="1.8" />
+      <module name="spring_main" target="1.8" />
+      <module name="spring_test" target="1.8" />
       <module name="web-server-common_main" target="1.8" />
       <module name="web-server-common_test" target="1.8" />
       <module name="web-server-ktor_main" target="1.8" />

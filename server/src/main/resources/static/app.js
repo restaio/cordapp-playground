@@ -96,7 +96,7 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
     };
 
     modalInstance.displayMessage = (message) => {
-        const modalInstanceTwo = $uibModal.open({
+        $uibModal.open({
             templateUrl: "messageContent.html",
             controller: "ShowMessageController",
             controllerAs: "showMessageModal",
@@ -105,9 +105,7 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
     };
 
     // Close send Yo modal.
-    modalInstance.dismissModal = function dismissModal() {
-        $uibModalInstance.dismiss();
-    }
+    modalInstance.cancel = $uibModalInstance.dismiss;
 
     // Validates the Yo.
     function isFormInvalid() {

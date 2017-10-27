@@ -58,11 +58,13 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 task runPartyAServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.corda.server.ServerKt'
-    args = ["8080","10006"]
+    environment "server.port", "8080"
+    environment "config.rpc.port", "10006"
 }
 
 task runPartyBServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.corda.server.ServerKt'
-    args = ["8081","10009"]
+    environment "server.port", "8081"
+    environment "config.rpc.port", "10009"
 }
