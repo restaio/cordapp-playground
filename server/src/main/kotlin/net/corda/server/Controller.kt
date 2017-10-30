@@ -35,7 +35,8 @@ private class RestController(
 
     private val myName = rpc.proxy.nodeInfo().legalIdentities.first().name
 
-    // Starts streaming new Yo states to the websocket.
+    // Upon creation, the controller starts streaming information on new Yo states to a websocket.
+    // The front-end can subscribe to this websocket to be notified of updates.
     init {
         val yoStateVaultObservable = rpc.proxy.vaultTrack(YoState::class.java).updates
         yoStateVaultObservable.subscribe { update ->
