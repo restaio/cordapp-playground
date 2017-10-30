@@ -37,7 +37,8 @@ private class RestController(
 
     // Starts streaming new Yo states to the websocket.
     init {
-        rpc.proxy.vaultTrack(YoState::class.java).updates.subscribe { update ->
+        val yoStateVaultObservable = rpc.proxy.vaultTrack(YoState::class.java).updates
+        yoStateVaultObservable.subscribe { update ->
             update.produced.forEach { (state) ->
                 val yoStateJson = state.data.toJson()
                 template.convertAndSend("/stompresponse", yoStateJson)
