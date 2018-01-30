@@ -6,9 +6,7 @@ import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
 import net.corda.core.flows.StartableByRPC
-import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
-import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
 import net.corda.core.schemas.QueryableState
@@ -16,55 +14,9 @@ import net.corda.core.transactions.LedgerTransaction
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
-import net.corda.core.utilities.getOrThrow
-import net.corda.webserver.services.WebServerPluginRegistry
-import java.util.function.Function
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
-import javax.ws.rs.GET
-import javax.ws.rs.Path
-import javax.ws.rs.Produces
-import javax.ws.rs.QueryParam
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
-
-// API.
-@Path("yo")
-class YoApi(val rpcOps: CordaRPCOps) {
-    @GET
-    @Path("yo")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun yo(@QueryParam(value = "target") target: CordaX500Name?): Response {
-        val (status, message) = try {
-            // Is the 'target' valid?
-            val toYo = rpcOps.wellKnownPartyFromX500Name(target!!) ?: throw Exception("Party not recognised.")
-            // Start the flow.
-            val flowHandle = rpcOps.startFlowDynamic(YoFlow::class.java, toYo)
-            flowHandle.use { it.returnValue.getOrThrow() }
-            // Return the response.
-            Response.Status.CREATED to "You just sent a Yo! to ${toYo.name}"
-        } catch (e: Exception) {
-            Response.Status.BAD_REQUEST to e.message
-        }
-        return Response.status(status).entity(message).build()
-    }
-
-    @GET
-    @Path("yos")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun yos() = rpcOps.vaultQuery(YoState::class.java).states
-
-    @GET
-    @Path("me")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun me() = mapOf("me" to rpcOps.nodeInfo().legalIdentities.first().name)
-
-    @GET
-    @Path("peers")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun peers() = mapOf("peers" to rpcOps.networkMapSnapshot().map { it.legalIdentities.first().name })
-}
 
 // Flow.
 @InitiatingFlow
@@ -149,9 +101,4 @@ data class YoState(val origin: Party,
                 var yo: String = ""
         ) : PersistentState()
     }
-}
-
-class YoWebPlugin : WebServerPluginRegistry {
-    override val webApis = listOf(Function(::YoApi))
-    override val staticServeDirs = mapOf("yo" to javaClass.classLoader.getResource("yoWeb").toExternalForm())
 }
