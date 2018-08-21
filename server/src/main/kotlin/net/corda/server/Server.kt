@@ -7,12 +7,25 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 
-
 /**
  * Our Spring Boot application.
  */
 @SpringBootApplication
-private open class Starter {
+open class Server {
+
+    companion object {
+
+        /**
+         * Starts our Spring Boot application.
+         */
+        @JvmStatic fun main(args: Array<String>) {
+            val app = SpringApplication(Server::class.java)
+            app.setBannerMode(Banner.Mode.OFF)
+            app.isWebEnvironment = true
+            app.run(*args)
+        }
+    }
+
     /** Registers an endpoint for STOMP messages. */
     @EnableWebSocketMessageBroker
     open class WebSocketConfig : AbstractWebSocketMessageBrokerConfigurer() {
@@ -20,14 +33,4 @@ private open class Starter {
             registry.addEndpoint("/stomp").withSockJS()
         }
     }
-}
-
-/**
- * Starts our Spring Boot application.
- */
-fun main(args: Array<String>) {
-    val app = SpringApplication(Starter::class.java)
-    app.setBannerMode(Banner.Mode.OFF)
-    app.isWebEnvironment = true
-    app.run(*args)
 }

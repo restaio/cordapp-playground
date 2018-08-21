@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
-
 private const val CONTROLLER_NAME = "config.controller.name"
 
 /**
@@ -25,9 +24,10 @@ private const val CONTROLLER_NAME = "config.controller.name"
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
 private class RestController(
-        private val rpc: NodeRPCConnection,
-        private val template: SimpMessagingTemplate,
-        @Value("\${$CONTROLLER_NAME}") private val controllerName: String) {
+    private val rpc: NodeRPCConnection,
+    private val template: SimpMessagingTemplate,
+    @Value("\${$CONTROLLER_NAME}") private val controllerName: String
+) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(RestController::class.java)
@@ -79,7 +79,8 @@ private class RestController(
     private fun sendYo(request: HttpServletRequest): ResponseEntity<String> {
         val targetName = request.getParameter("target")
         val targetX500Name = CordaX500Name.parse(targetName)
-        val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name) ?: throw IllegalArgumentException("Unrecognised peer.")
+        val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name)
+            ?: throw IllegalArgumentException("Unrecognised peer.")
         val flow = rpc.proxy.startFlowDynamic(YoFlow::class.java, target)
 
         return try {
