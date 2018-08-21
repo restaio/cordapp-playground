@@ -8,9 +8,7 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 
-/**
- * Our Spring Boot application.
- */
+/** Our Spring Boot application. */
 @SpringBootApplication
 open class Server {
 

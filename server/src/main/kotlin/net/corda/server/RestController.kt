@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
-private const val CONTROLLER_NAME = "config.controller.name"
-
 /**
  *  A controller for interacting with the node via RPC.
  */
@@ -26,10 +24,11 @@ private const val CONTROLLER_NAME = "config.controller.name"
 class RestController(
     private val rpc: NodeRPCConnection,
     private val template: SimpMessagingTemplate,
-    @Value("\${$CONTROLLER_NAME}") private val controllerName: String
+    @Value("\${$NAME}") private val controllerName: String
 ) {
 
     companion object {
+        private const val NAME = "config.controller.name"
         private val logger = LoggerFactory.getLogger(RestController::class.java)
     }
 
@@ -67,8 +66,8 @@ class RestController(
     }
 
     /** Returns a list of existing Yo's. */
-    @GetMapping(value = "/getyos", produces = arrayOf("application/json"))
-    private fun getYos(): List<Map<String, String>> {
+    @GetMapping(value = "/list", produces = arrayOf("application/json"))
+    private fun list(): List<Map<String, String>> {
         val yoStateAndRefs = rpc.proxy.vaultQueryBy<YoState>().states
         val yoStates = yoStateAndRefs.map { it.state.data }
         return yoStates.map { it.toJson() }

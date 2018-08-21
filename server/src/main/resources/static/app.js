@@ -3,7 +3,7 @@
 const REST_BASE_PATH = "/yo";
 const GET_ME_PATH = `${REST_BASE_PATH}/me`;
 const GET_PEERS_PATH = `${REST_BASE_PATH}/peers`;
-const GET_YOS_PATH = `${REST_BASE_PATH}/getyos`;
+const LIST_PATH = `${REST_BASE_PATH}/list`;
 const SEND_YO_PATH = `${REST_BASE_PATH}/sendyo`;
 const STOMP_SUBSCRIBE_PATH = "/stomp";
 const STOMP_RESPONSE_PATH = "/stompresponse";
@@ -57,8 +57,8 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     };
 
     // Gets a list of existing Yo's.
-    function getYos() {
-        $http.get(GET_YOS_PATH).then(function processYos(response) {
+    function list() {
+        $http.get(LIST_PATH).then(function processYos(response) {
             let yos = Object.keys(response.data)
                 .map((key) => response.data[key]);
             yoApp.yos = yos;
@@ -66,7 +66,7 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     }
 
     // Pre-populate the list of Yo's.
-    getYos();
+    list();
 });
 
 // Controller for send-yo modal.

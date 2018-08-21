@@ -18,8 +18,8 @@ data class YoState(
     override val participants get() = listOf(target)
     override fun toString() = "${origin.name}: $yo"
     override fun supportedSchemas() = listOf(YoSchemaV1)
-    override fun generateMappedObject(schema: MappedSchema) = YoSchemaV1.PersistentYoState(
-        origin.name.toString(), target.name.toString(), yo)
+    override fun generateMappedObject(schema: MappedSchema) =
+        YoSchemaV1.PersistentYoState(origin.name.toString(), target.name.toString(), yo)
 
     object YoSchema
 
