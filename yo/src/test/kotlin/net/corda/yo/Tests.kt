@@ -5,12 +5,21 @@ import net.corda.core.node.services.vault.QueryCriteria.VaultCustomQueryCriteria
 import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.node.internal.StartedNode
-import net.corda.testing.*
+import net.corda.testing.ALICE
+import net.corda.testing.ALICE_PUBKEY
+import net.corda.testing.BOB
+import net.corda.testing.DummyCommandData
+import net.corda.testing.MINI_CORP_PUBKEY
 import net.corda.testing.contracts.DUMMY_PROGRAM_ID
 import net.corda.testing.contracts.DummyState
+import net.corda.testing.ledger
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetwork.MockNode
-import net.corda.yo.YoState.YoSchemaV1.PersistentYoState
+import net.corda.testing.setCordappPackages
+import net.corda.testing.unsetCordappPackages
+import net.corda.yo.contract.YoContract
+import net.corda.yo.flow.YoFlow
+import net.corda.yo.state.YoState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -55,7 +64,7 @@ class YoFlowTests {
             assertEquals(bYo.toString(), yo.toString())
             print("$bYo == $yo\n")
             // Using a custom criteria directly referencing schema entity attribute.
-            val expression = builder { PersistentYoState::yo.equal("Yo!") }
+            val expression = builder { YoState.YoSchemaV1.PersistentYoState::yo.equal("Yo!") }
             val customQuery = VaultCustomQueryCriteria(expression)
             val bYo2 = b.services.vaultService.queryBy<YoState>(customQuery).states.single().state.data
             assertEquals(bYo2.yo, yo.yo)
@@ -85,29 +94,29 @@ class YoContractTests {
             transaction {
                 input(DUMMY_PROGRAM_ID) { DummyState() }
                 command(ALICE_PUBKEY) { YoContract.Send() }
-                output(YO_CONTRACT_ID) { yo }
+                output(YoContract.ID) { yo }
                 this.failsWith("There can be no inputs when Yo'ing other parties.")
             }
             // Wrong command.
             transaction {
-                output(YO_CONTRACT_ID) { yo }
+                output(YoContract.ID) { yo }
                 command(ALICE_PUBKEY) { DummyCommandData }
                 this.failsWith("")
             }
             // Command signed by wrong key.
             transaction {
-                output(YO_CONTRACT_ID) { yo }
+                output(YoContract.ID) { yo }
                 command(MINI_CORP_PUBKEY) { YoContract.Send() }
                 this.failsWith("The Yo! must be signed by the sender.")
             }
             // Sending to yourself is not allowed.
             transaction {
-                output(YO_CONTRACT_ID) { YoState(ALICE, ALICE) }
+                output(YoContract.ID) { YoState(ALICE, ALICE) }
                 command(ALICE_PUBKEY) { YoContract.Send() }
                 this.failsWith("No sending Yo's to yourself!")
             }
             transaction {
-                output(YO_CONTRACT_ID) { yo }
+                output(YoContract.ID) { yo }
                 command(ALICE_PUBKEY) { YoContract.Send() }
                 this.verifies()
             }

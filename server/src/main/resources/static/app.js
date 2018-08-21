@@ -1,8 +1,8 @@
 "use strict";
 
 const REST_BASE_PATH = "/yo";
-const GET_ME_PATH = `${REST_BASE_PATH}/myname`;
-const GET_PEERS_PATH = `${REST_BASE_PATH}/peersnames`;
+const GET_ME_PATH = `${REST_BASE_PATH}/me`;
+const GET_PEERS_PATH = `${REST_BASE_PATH}/peers`;
 const GET_YOS_PATH = `${REST_BASE_PATH}/getyos`;
 const SEND_YO_PATH = `${REST_BASE_PATH}/sendyo`;
 const STOMP_SUBSCRIBE_PATH = "/stomp";

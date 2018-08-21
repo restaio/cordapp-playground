@@ -4,8 +4,8 @@ import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.utilities.getOrThrow
-import net.corda.yo.YoFlow
-import net.corda.yo.YoState
+import net.corda.yo.flow.YoFlow
+import net.corda.yo.state.YoState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -53,12 +53,12 @@ class RestController(
     }
 
     /** Returns the node's name. */
-    @GetMapping(value = "/myname", produces = arrayOf("text/plain"))
-    private fun myName() = myName.toString()
+    @GetMapping(value = "/me", produces = arrayOf("text/plain"))
+    private fun me() = myName.toString()
 
     /** Returns a list of the node's network peers. */
-    @GetMapping(value = "/peersnames", produces = arrayOf("application/json"))
-    private fun peersNames(): Map<String, List<String>> {
+    @GetMapping(value = "/peers", produces = arrayOf("application/json"))
+    private fun peers(): Map<String, List<String>> {
         val nodes = rpc.proxy.networkMapSnapshot()
         val nodeNames = nodes.map { it.legalIdentities.first().name }
         val filteredNodeNames = nodeNames.filter { it.organisation !in listOf(controllerName, myName) }

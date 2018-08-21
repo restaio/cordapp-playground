@@ -3,6 +3,7 @@ package net.corda.yo
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.utilities.NetworkHostAndPort
 import net.corda.core.utilities.loggerFor
+import net.corda.yo.state.YoState
 import org.slf4j.Logger
 
 class Client {
