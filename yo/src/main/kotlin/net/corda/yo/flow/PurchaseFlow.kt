@@ -16,7 +16,11 @@ import net.corda.yo.state.PurchaseState
 
 @InitiatingFlow
 @StartableByRPC
-class PurchaseFlow(val target: Party) : FlowLogic<SignedTransaction>() {
+class PurchaseFlow(
+    val target: Party,
+    val property: String,
+    val value: Int
+) : FlowLogic<SignedTransaction>() {
 
     override val progressTracker: ProgressTracker = PurchaseFlow.tracker()
 
@@ -38,7 +42,7 @@ class PurchaseFlow(val target: Party) : FlowLogic<SignedTransaction>() {
         val me = serviceHub.myInfo.legalIdentities.first()
         val notary = serviceHub.networkMapCache.notaryIdentities.single()
         val command = Command(PurchaseContract.Send(), listOf(me.owningKey))
-        val state = PurchaseState(me, target)
+        val state = PurchaseState(me, target, property, value)
         val stateAndContract = StateAndContract(state, PurchaseContract.ID)
         val utx = TransactionBuilder(notary = notary).withItems(stateAndContract, command)
 

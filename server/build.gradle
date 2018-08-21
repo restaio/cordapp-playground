@@ -35,14 +35,14 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-task runPartyAServer(type: JavaExec) {
+task runAServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.corda.server.Server'
     environment 'server.port', '8080'
     environment 'config.rpc.port', '10006'
 }
 
-task runPartyBServer(type: JavaExec) {
+task runBServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.corda.server.Server'
     environment 'server.port', '8081'

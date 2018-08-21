@@ -25,6 +25,9 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
+const val TEST_PROPERTY = "Test"
+const val TEST_VALUE = 1234
+
 class PurchaseFlowTests {
     lateinit var net: MockNetwork
     lateinit var a: StartedNode<MockNode>
@@ -48,8 +51,8 @@ class PurchaseFlowTests {
 
     @Test
     fun flowWorksCorrectly() {
-        val yo = PurchaseState(a.info.legalIdentities.first(), b.info.legalIdentities.first())
-        val flow = PurchaseFlow(b.info.legalIdentities.first())
+        val yo = PurchaseState(a.info.legalIdentities.first(), b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
+        val flow = PurchaseFlow(b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
         val future = a.services.startFlow(flow).resultFuture
         net.runNetwork()
         val stx = future.getOrThrow()
@@ -87,7 +90,7 @@ class PurchaseContractTests {
     // @Test
     fun yoTransactionMustBeWellFormed() {
         // A pre-made Yo to Bob.
-        val yo = PurchaseState(ALICE, BOB)
+        val yo = PurchaseState(ALICE, BOB, TEST_PROPERTY, TEST_VALUE)
         // Tests.
         ledger {
             // Input state present.
@@ -111,7 +114,7 @@ class PurchaseContractTests {
             }
             // Purchasing from yourself is not allowed.
             transaction {
-                output(PurchaseContract.ID) { PurchaseState(ALICE, ALICE) }
+                output(PurchaseContract.ID) { PurchaseState(ALICE, ALICE, TEST_PROPERTY, TEST_VALUE) }
                 command(ALICE_PUBKEY) { PurchaseContract.Send() }
                 this.failsWith("No sending Yo's to yourself!")
             }

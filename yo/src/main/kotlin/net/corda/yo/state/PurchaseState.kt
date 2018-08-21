@@ -12,8 +12,8 @@ import javax.persistence.Table
 data class PurchaseState(
     val origin: Party,
     val target: Party,
-    val property: String = "Test",
-    val value: Int = 1234
+    val property: String,
+    val value: Int
 ) : ContractState, QueryableState {
     override val participants get() = listOf(target)
     override fun toString() = "${origin.name}: $property ($value)"

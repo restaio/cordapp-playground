@@ -21,6 +21,7 @@ open class Server {
             isWebEnvironment = true
         }
 
+        /** For debugging purposes. */
         fun refresh() = app.refresh()
 
         private inline fun <reified T> launch(args: Array<String>, init: SpringApplication.() -> Unit) {

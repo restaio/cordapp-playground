@@ -6,11 +6,6 @@ import net.corda.core.utilities.NetworkHostAndPort
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
-private const val CORDA_USER_NAME = "config.rpc.username"
-private const val CORDA_USER_PASSWORD = "config.rpc.password"
-private const val CORDA_NODE_HOST = "config.rpc.host"
-private const val CORDA_RPC_PORT = "config.rpc.port"
-
 /**
  * Wraps a node RPC proxy.
  *
@@ -29,6 +24,13 @@ open class NodeRPCConnection(
     @Value("\${$CORDA_USER_PASSWORD}") password: String,
     @Value("\${$CORDA_RPC_PORT}") rpcPort: Int
 ) {
+
+    private companion object {
+        const val CORDA_USER_NAME = "config.rpc.username"
+        const val CORDA_USER_PASSWORD = "config.rpc.password"
+        const val CORDA_NODE_HOST = "config.rpc.host"
+        const val CORDA_RPC_PORT = "config.rpc.port"
+    }
 
     val proxy: CordaRPCOps
 

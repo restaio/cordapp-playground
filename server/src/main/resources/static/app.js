@@ -1,12 +1,12 @@
 "use strict";
 
-const REST_BASE_PATH = "/yo";
-const GET_ME_PATH = `${REST_BASE_PATH}/me`;
-const GET_PEERS_PATH = `${REST_BASE_PATH}/peers`;
-const LIST_PURCHASES_PATH = `${REST_BASE_PATH}/listpurchases`;
-const PURCHASE_PATH = `${REST_BASE_PATH}/purchase`;
-const STOMP_SUBSCRIBE_PATH = "/stomp";
-const STOMP_RESPONSE_PATH = "/stompresponse";
+const PATH_REST_BASE = "/property";
+const PATH_ME = `${PATH_REST_BASE}/me`;
+const PATH_PEERS = `${PATH_REST_BASE}/peers`;
+const PATH_PURCHASES = `${PATH_REST_BASE}/purchases`;
+const PATH_PURCHASE = `${PATH_REST_BASE}/purchase`;
+const PATH_STOMP_SUBSCRIBE = "/stomp";
+const PATH_STOMP_RESPONSE = "/stompresponse";
 
 const app = angular.module("yoAppModule", ["ui.bootstrap"]);
 
@@ -16,7 +16,7 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
 
     // Retrieves my identity.
     (function retrieveMe() {
-        $http.get(GET_ME_PATH)
+        $http.get(PATH_ME)
             .then(function storeMe(response) {
                 yoApp.me = response.data;
             })
@@ -24,7 +24,7 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
 
     // Retrieves a list of network peers.
     (function retrievePeers() {
-        $http.get(GET_PEERS_PATH)
+        $http.get(PATH_PEERS)
             .then(function storePeers(response) {
                 peers = response.data.peers;
             })
@@ -32,10 +32,10 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
 
     // Starts streaming new Yo's from the websocket.
     (function connectAndStartStreamingYos() {
-        let socket = new SockJS(STOMP_SUBSCRIBE_PATH);
+        let socket = new SockJS(PATH_STOMP_SUBSCRIBE);
         let stompClient = Stomp.over(socket);
         stompClient.connect({}, function startStreamingYos(frame) {
-            stompClient.subscribe(STOMP_RESPONSE_PATH, function updateYos(update) {
+            stompClient.subscribe(PATH_STOMP_RESPONSE, function updateYos(update) {
                 let yoState = JSON.parse(update.body);
                 yoApp.yos.push(yoState);
                 // Forces the view to refresh, showing the new Yo.
@@ -57,8 +57,8 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     };
 
     // Gets a list of existing Yo's.
-    function listPurchases() {
-        $http.get(LIST_PURCHASES_PATH).then(function processYos(response) {
+    function purchases() {
+        $http.get(PATH_PURCHASES).then(function processYos(response) {
             let yos = Object.keys(response.data)
                 .map((key) => response.data[key]);
             yoApp.yos = yos;
@@ -66,7 +66,7 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     }
 
     // Pre-populate the list of Yo's.
-    listPurchases();
+    purchases();
 });
 
 // Controller for purchase modal.
@@ -95,7 +95,7 @@ app.controller("PurchaseModalController", function ($http, $location, $uibModalI
             };
 
             // Purchase and handles success / fail responses.
-            $http.post(PURCHASE_PATH, purchaseData, purchaseHeaders).then(
+            $http.post(PATH_PURCHASE, purchaseData, purchaseHeaders).then(
                 modalInstance.displayMessage,
                 modalInstance.displayMessage
             );
