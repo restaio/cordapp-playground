@@ -23,7 +23,7 @@ private const val CONTROLLER_NAME = "config.controller.name"
  */
 @RestController
 @RequestMapping("/yo") // The paths for GET and POST requests are relative to this base path.
-private class RestController(
+class RestController(
     private val rpc: NodeRPCConnection,
     private val template: SimpMessagingTemplate,
     @Value("\${$CONTROLLER_NAME}") private val controllerName: String

@@ -14,8 +14,8 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 @SpringBootApplication
 open class Server {
 
-    companion object : ConfigurableApplicationContext by Server.APP {
-        private lateinit var APP: ConfigurableApplicationContext
+    companion object {
+        private lateinit var app: ConfigurableApplicationContext
 
         /** Starts our Spring Boot application. */
         @JvmStatic fun main(args: Array<String>) = launch<Server>(args) {
@@ -23,8 +23,10 @@ open class Server {
             isWebEnvironment = true
         }
 
+        fun refresh() = app.refresh()
+
         private inline fun <reified T> launch(args: Array<String>, init: SpringApplication.() -> Unit) {
-            APP = SpringApplication(T::class.java).apply(init).run(*args)
+            app = SpringApplication(T::class.java).apply(init).run(*args)
         }
     }
 
