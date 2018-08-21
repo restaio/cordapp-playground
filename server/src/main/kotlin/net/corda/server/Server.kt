@@ -1,8 +1,9 @@
 package net.corda.server
 
-import org.springframework.boot.Banner
+import org.springframework.boot.Banner.Mode.OFF
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
@@ -13,16 +14,17 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 @SpringBootApplication
 open class Server {
 
-    companion object {
+    companion object : ConfigurableApplicationContext by Server.APP {
+        private lateinit var APP: ConfigurableApplicationContext
 
-        /**
-         * Starts our Spring Boot application.
-         */
-        @JvmStatic fun main(args: Array<String>) {
-            val app = SpringApplication(Server::class.java)
-            app.setBannerMode(Banner.Mode.OFF)
-            app.isWebEnvironment = true
-            app.run(*args)
+        /** Starts our Spring Boot application. */
+        @JvmStatic fun main(args: Array<String>) = launch<Server>(args) {
+            setBannerMode(OFF)
+            isWebEnvironment = true
+        }
+
+        private inline fun <reified T> launch(args: Array<String>, init: SpringApplication.() -> Unit) {
+            APP = SpringApplication(T::class.java).apply(init).run(*args)
         }
     }
 

@@ -75,7 +75,7 @@ class YoContractTests {
         unsetCordappPackages()
     }
 
-    @Test
+    // @Test
     fun yoTransactionMustBeWellFormed() {
         // A pre-made Yo to Bob.
         val yo = YoState(ALICE, BOB)
