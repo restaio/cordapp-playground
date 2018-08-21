@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Yo CorDapp</title>
+    <title>CorDapp Playground</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
 
@@ -21,23 +21,23 @@
         <div class="navbar-header">
             <a class="navbar-brand" href="#">{{yoApp.me}}</a>
         </div>
-        <button ng-click="yoApp.openSendYoModal()" type="button" class="btn btn-primary navbar-btn">Send Yo!</button>
+        <button ng-click="yoApp.openPurchaseModal()" type="button" class="btn btn-primary navbar-btn">Purchase!</button>
     </div>
 </nav>
 
 <script type="text/ng-template" id="yoAppModal.html">
     <div class="modal-header">
-        <h4 class="modal-title">Send Yo!</h4>
+        <h4 class="modal-title">Purchase!</h4>
     </div>
     <form>
         <div class="modal-body">
             <div class="form-group">
                 <label for="target" class="control-label">Peer:</label>
-                <select ng-model="sendYoModal.form.target" class="form-control" id="target"
-                        ng-options="peer as peer for peer in sendYoModal.peers">
+                <select ng-model="purchaseModal.form.target" class="form-control" id="target"
+                        ng-options="peer as peer for peer in purchaseModal.peers">
                 </select>
             </div>
-            <div ng-show="sendYoModal.formError" class="form-group">
+            <div ng-show="purchaseModal.formError" class="form-group">
                 <div class="alert alert-danger" role="alert">
                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                     <span class="sr-only">Error:</span>
@@ -46,8 +46,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button ng-click="sendYoModal.cancel()" type="button" class="btn btn-default">Close</button>
-            <button ng-click="sendYoModal.create()" type="button" class="btn btn-primary">Send Yo!</button>
+            <button ng-click="purchaseModal.cancel()" type="button" class="btn btn-default">Close</button>
+            <button ng-click="purchaseModal.create()" type="button" class="btn btn-primary">Purchase!</button>
         </div>
     </form>
 </script>
@@ -65,7 +65,7 @@
             <div class="panel-heading">
                 <h3 class="panel-title">There are no recorded Yo's.</h3>
             </div>
-            <div class="panel-body">Use the "Send Yo!" button to send a Yo to a peer.</div>
+            <div class="panel-body">Use the "Purchase!" button to send a Yo to a peer.</div>
         </div>
         <div class="panel panel-primary">
             <div class="panel-heading">

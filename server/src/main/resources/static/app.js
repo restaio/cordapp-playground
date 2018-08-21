@@ -3,8 +3,8 @@
 const REST_BASE_PATH = "/yo";
 const GET_ME_PATH = `${REST_BASE_PATH}/me`;
 const GET_PEERS_PATH = `${REST_BASE_PATH}/peers`;
-const LIST_PATH = `${REST_BASE_PATH}/list`;
-const SEND_YO_PATH = `${REST_BASE_PATH}/sendyo`;
+const LIST_PURCHASES_PATH = `${REST_BASE_PATH}/listpurchases`;
+const PURCHASE_PATH = `${REST_BASE_PATH}/purchase`;
 const STOMP_SUBSCRIBE_PATH = "/stomp";
 const STOMP_RESPONSE_PATH = "/stompresponse";
 
@@ -44,12 +44,12 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
         });
     })();
 
-    // Opens the send-Yo modal.
-    yoApp.openSendYoModal = function openSendYoModal() {
+    // Opens the purchase modal.
+    yoApp.openPurchaseModal = function openPurchaseModal() {
         $uibModal.open({
             templateUrl: "yoAppModal.html",
-            controller: "SendYoModalController",
-            controllerAs: "sendYoModal",
+            controller: "PurchaseModalController",
+            controllerAs: "purchaseModal",
             resolve: {
                 peers: () => peers
             }
@@ -57,8 +57,8 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     };
 
     // Gets a list of existing Yo's.
-    function list() {
-        $http.get(LIST_PATH).then(function processYos(response) {
+    function listPurchases() {
+        $http.get(LIST_PURCHASES_PATH).then(function processYos(response) {
             let yos = Object.keys(response.data)
                 .map((key) => response.data[key]);
             yoApp.yos = yos;
@@ -66,18 +66,18 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     }
 
     // Pre-populate the list of Yo's.
-    list();
+    listPurchases();
 });
 
-// Controller for send-yo modal.
-app.controller("SendYoModalController", function ($http, $location, $uibModalInstance, $uibModal, peers) {
+// Controller for purchase modal.
+app.controller("PurchaseModalController", function ($http, $location, $uibModalInstance, $uibModal, peers) {
     const modalInstance = this;
     modalInstance.peers = peers;
     modalInstance.form = {};
     modalInstance.formError = false;
 
-    // Validates and sends Yo.
-    modalInstance.create = function validateAndSendYo() {
+    // Validates and purchase.
+    modalInstance.create = function validateAndPurchase() {
         if (isFormInvalid()) {
             modalInstance.formError = true;
 
@@ -85,24 +85,24 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
             modalInstance.formError = false;
             $uibModalInstance.close();
 
-            let sendYoData = $.param({
+            let purchaseData = $.param({
                 target: modalInstance.form.target
             });
-            let sendYoHeaders = {
+            let purchaseHeaders = {
                 headers : {
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
             };
 
-            // Sends Yo and handles success / fail responses.
-            $http.post(SEND_YO_PATH, sendYoData, sendYoHeaders).then(
+            // Purchase and handles success / fail responses.
+            $http.post(PURCHASE_PATH, purchaseData, purchaseHeaders).then(
                 modalInstance.displayMessage,
                 modalInstance.displayMessage
             );
         }
     };
 
-    // Display result message from sending Yo.
+    // Display result message from purchasing.
     modalInstance.displayMessage = function displayMessage(message) {
         $uibModal.open({
             templateUrl: "messageContent.html",
@@ -112,10 +112,10 @@ app.controller("SendYoModalController", function ($http, $location, $uibModalIns
         });
     };
 
-    // Closes the send-Yo modal.
+    // Closes the puchase modal.
     modalInstance.cancel = $uibModalInstance.dismiss;
 
-    // Validates the Yo before sending.
+    // Validates before purchasing.
     function isFormInvalid() {
         return modalInstance.form.target === undefined;
     }

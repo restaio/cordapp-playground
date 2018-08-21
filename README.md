@@ -19,8 +19,8 @@ The backend has two controllers, defined in `server/src/main/kotlin/net/corda/se
 * `RestController`, which manages standard REST requests. It defines four endpoints:
     * GET `yo/me/`, to retrieve the node's identity
     * GET `yo/peers/`, to retrieve the node's network peers
-    * GET `yo/list/`, to retrieve any Yo's from the node's vault
-    * POST `yo/sendyo/`, to send a Yo to another node
+    * GET `yo/listpurchases/`, to retrieve any Yo's from the node's vault
+    * POST `yo/purchase/`, to send a Yo to another node
     
 * `StompController`, which defines a a single endpoint, `/stomp/streamyos`. Our web frontend hits 
   this endpoint automatically when it loads. This causes the webserver to retrieve an observable 

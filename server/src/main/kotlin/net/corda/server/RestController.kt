@@ -4,8 +4,8 @@ import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.utilities.getOrThrow
-import net.corda.yo.flow.YoFlow
-import net.corda.yo.state.YoState
+import net.corda.yo.flow.PurchaseFlow
+import net.corda.yo.state.PurchaseState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -37,7 +37,7 @@ class RestController(
     // Upon creation, the controller starts streaming information on new Yo states to a websocket.
     // The front-end can subscribe to this websocket to be notified of updates.
     init {
-        val yoStateVaultObservable = rpc.proxy.vaultTrack(YoState::class.java).updates
+        val yoStateVaultObservable = rpc.proxy.vaultTrack(PurchaseState::class.java).updates
         yoStateVaultObservable.subscribe { update ->
             update.produced.forEach { (state) ->
                 val yoStateJson = state.data.toJson()
@@ -46,10 +46,12 @@ class RestController(
         }
     }
 
-    /** Maps a YoState to a JSON object. */
-    private fun YoState.toJson(): Map<String, String> {
-        return mapOf("origin" to origin.name.organisation, "target" to target.name.toString(), "yo" to yo)
-    }
+    /** Maps a PurchaseState to a JSON object. */
+    private fun PurchaseState.toJson(): Map<String, String> = mapOf(
+        "origin" to origin.name.organisation,
+        "target" to target.name.toString(),
+        "property" to property,
+        "value" to value.toString())
 
     /** Returns the node's name. */
     @GetMapping(value = "/me", produces = arrayOf("text/plain"))
@@ -66,22 +68,22 @@ class RestController(
     }
 
     /** Returns a list of existing Yo's. */
-    @GetMapping(value = "/list", produces = arrayOf("application/json"))
-    private fun list(): List<Map<String, String>> {
-        val yoStateAndRefs = rpc.proxy.vaultQueryBy<YoState>().states
+    @GetMapping(value = "/listpurchases", produces = arrayOf("application/json"))
+    private fun listPurchases(): List<Map<String, String>> {
+        val yoStateAndRefs = rpc.proxy.vaultQueryBy<PurchaseState>().states
         val yoStates = yoStateAndRefs.map { it.state.data }
         return yoStates.map { it.toJson() }
     }
 
-    /** Sends a Yo to a counterparty. */
-    @PostMapping(value = "/sendyo", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
-    private fun sendYo(request: HttpServletRequest): ResponseEntity<String> {
+    /** Purchase a property from a counterparty. */
+    @PostMapping(value = "/purchase", produces = arrayOf("text/plain"),
+        headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    private fun purchase(request: HttpServletRequest): ResponseEntity<String> {
         val targetName = request.getParameter("target")
         val targetX500Name = CordaX500Name.parse(targetName)
         val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name)
             ?: throw IllegalArgumentException("Unrecognised peer.")
-        val flow = rpc.proxy.startFlowDynamic(YoFlow::class.java, target)
-
+        val flow = rpc.proxy.startFlowDynamic(PurchaseFlow::class.java, target)
         return try {
             flow.returnValue.getOrThrow()
             ResponseEntity.ok("You just sent a Yo! to ${target.name}")

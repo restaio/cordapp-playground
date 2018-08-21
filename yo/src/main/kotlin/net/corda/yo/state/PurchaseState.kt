@@ -9,30 +9,32 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
 
-// State.
-data class YoState(
+data class PurchaseState(
     val origin: Party,
     val target: Party,
-    val yo: String = "Yo!"
+    val property: String = "Test",
+    val value: Int = 1234
 ) : ContractState, QueryableState {
     override val participants get() = listOf(target)
-    override fun toString() = "${origin.name}: $yo"
-    override fun supportedSchemas() = listOf(YoSchemaV1)
+    override fun toString() = "${origin.name}: $property ($value)"
+    override fun supportedSchemas() = listOf(PurchaseSchemaV1)
     override fun generateMappedObject(schema: MappedSchema) =
-        YoSchemaV1.PersistentYoState(origin.name.toString(), target.name.toString(), yo)
+        PurchaseSchemaV1.PersistentPurchaseState(origin.name.toString(), target.name.toString(), property)
 
-    object YoSchema
+    object PurchaseSchema
 
-    object YoSchemaV1 : MappedSchema(YoSchema.javaClass, 1, listOf(PersistentYoState::class.java)) {
+    object PurchaseSchemaV1 : MappedSchema(PurchaseSchema.javaClass, 1, listOf(PersistentPurchaseState::class.java)) {
         @Entity
-        @Table(name = "yos")
-        class PersistentYoState(
+        @Table(name = "purchases")
+        class PersistentPurchaseState(
             @Column(name = "origin")
             var origin: String = "",
             @Column(name = "target")
             var target: String = "",
-            @Column(name = "yo")
-            var yo: String = ""
+            @Column(name = "property")
+            var property: String = "",
+            @Column(name = "value")
+            var value: Int = 0
         ) : PersistentState()
     }
 }

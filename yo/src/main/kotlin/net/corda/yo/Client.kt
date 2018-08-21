@@ -3,7 +3,7 @@ package net.corda.yo
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.utilities.NetworkHostAndPort
 import net.corda.core.utilities.loggerFor
-import net.corda.yo.state.YoState
+import net.corda.yo.state.PurchaseState
 import org.slf4j.Logger
 
 class Client {
@@ -23,7 +23,7 @@ class Client {
             // Log the existing Yo's and listen for new ones.
             futureTransactions.startWith(transactions).toBlocking().subscribe { transaction ->
                 transaction.tx.outputs.forEach { output ->
-                    val state = output.data as YoState
+                    val state = output.data as PurchaseState
                     Client.logger.info(state.toString())
                 }
             }
