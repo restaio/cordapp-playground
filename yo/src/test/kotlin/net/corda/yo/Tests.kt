@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-const val TEST_PROPERTY = "Test"
+const val TEST_ESTATE = "Test"
 const val TEST_VALUE = 1234
 
 class InvestFlowTests {
@@ -51,8 +51,8 @@ class InvestFlowTests {
 
     @Test
     fun flowWorksCorrectly() {
-        val yo = InvestState(a.info.legalIdentities.first(), b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
-        val flow = InvestFlow(b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
+        val yo = InvestState(a.info.legalIdentities.first(), b.info.legalIdentities.first(), TEST_ESTATE, TEST_VALUE)
+        val flow = InvestFlow(b.info.legalIdentities.first(), TEST_ESTATE, TEST_VALUE)
         val future = a.services.startFlow(flow).resultFuture
         net.runNetwork()
         val stx = future.getOrThrow()
@@ -67,10 +67,10 @@ class InvestFlowTests {
             assertEquals(bYo.toString(), yo.toString())
             print("$bYo == $yo\n")
             // Using a custom criteria directly referencing schema entity attribute.
-            val expression = builder { InvestState.InvestSchemaV1.PersistentInvestState::property.equal("Test") }
+            val expression = builder { InvestState.InvestSchemaV1.PersistentInvestState::estate.equal("Test") }
             val customQuery = VaultCustomQueryCriteria(expression)
             val bYo2 = b.services.vaultService.queryBy<InvestState>(customQuery).states.single().state.data
-            assertEquals(bYo2.property, yo.property)
+            assertEquals(bYo2.estate, yo.estate)
             print("$bYo2 == $yo\n")
         }
     }
@@ -90,7 +90,7 @@ class InvestContractTests {
     // @Test
     fun yoTransactionMustBeWellFormed() {
         // A pre-made Yo to Bob.
-        val yo = InvestState(ALICE, BOB, TEST_PROPERTY, TEST_VALUE)
+        val yo = InvestState(ALICE, BOB, TEST_ESTATE, TEST_VALUE)
         // Tests.
         ledger {
             // Input state present.
@@ -114,7 +114,7 @@ class InvestContractTests {
             }
             // Purchasing from yourself is not allowed.
             transaction {
-                output(InvestContract.ID) { InvestState(ALICE, ALICE, TEST_PROPERTY, TEST_VALUE) }
+                output(InvestContract.ID) { InvestState(ALICE, ALICE, TEST_ESTATE, TEST_VALUE) }
                 command(ALICE_PUBKEY) { InvestContract.Send() }
                 this.failsWith("No sending Yo's to yourself!")
             }

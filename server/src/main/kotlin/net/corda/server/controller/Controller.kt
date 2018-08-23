@@ -1,7 +1,6 @@
 package net.corda.server.controller
 
 import net.corda.server.NodeRPCConnection
-import net.corda.yo.state.InvestState
 import org.springframework.messaging.simp.SimpMessagingTemplate
 
 interface Controller {
@@ -21,13 +20,6 @@ interface Controller {
         val filteredNodeNamesToStr = filteredNodeNames.map { it.toString() }
         return mapOf("peers" to filteredNodeNamesToStr)
     }
-
-    /** Maps a InvestState to a JSON object. */
-    fun InvestState.toJson(): Map<String, String> = mapOf(
-        "origin" to origin.name.organisation,
-        "target" to target.name.toString(),
-        "property" to property,
-        "value" to value.toString())
 
     private val myName get() = rpc.proxy.nodeInfo().legalIdentities.first().name
 }

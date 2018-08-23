@@ -18,7 +18,7 @@ import net.corda.yo.state.InvestState
 @StartableByRPC
 class InvestFlow(
     val target: Party,
-    val property: String,
+    val estate: String,
     val value: Int
 ) : FlowLogic<SignedTransaction>() {
 
@@ -42,7 +42,7 @@ class InvestFlow(
         val me = serviceHub.myInfo.legalIdentities.first()
         val notary = serviceHub.networkMapCache.notaryIdentities.single()
         val command = Command(InvestContract.Send(), listOf(me.owningKey))
-        val state = InvestState(me, target, property, value)
+        val state = InvestState(me, target, estate, value)
         val stateAndContract = StateAndContract(state, InvestContract.ID)
         val utx = TransactionBuilder(notary = notary).withItems(stateAndContract, command)
 

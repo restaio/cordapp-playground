@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
  * @param rpcPort The RPC port of the node we are connecting to.
  * @param username The username for logging into the RPC client.
  * @param password The password for logging into the RPC client.
- * @property proxy The RPC proxy.
+ * @estate proxy The RPC proxy.
  */
 @Component
 open class NodeRPCConnection(

@@ -1,6 +1,6 @@
 "use strict";
 
-const PATH_REST_BASE = "/property";
+const PATH_REST_BASE = "/estates";
 const PATH_ME = `${PATH_REST_BASE}/me`;
 const PATH_PEERS = `${PATH_REST_BASE}/peers`;
 const PATH_PURCHASES = `${PATH_REST_BASE}/purchases`;

@@ -17,16 +17,20 @@ import javax.servlet.http.HttpServletRequest
  * Logic are implemented on interfaces with default functions.
  */
 @RestController
-@RequestMapping("/property")
+@RequestMapping("/estates")
 class RestController(
     override val rpc: NodeRPCConnection,
     override val template: SimpMessagingTemplate,
     @Value("\${$NAME}") override val controllerName: String
 ) : InvestController {
 
-    companion object {
-        private const val NAME = "config.controller.name"
-        private val logger = LoggerFactory.getLogger(RestController::class.java)
+    private companion object {
+        const val NAME = "config.controller.name"
+        val logger = LoggerFactory.getLogger(RestController::class.java)
+
+        const val TEXT_PLAIN = "text/plain"
+        const val APP_JSON = "application/json"
+        const val URL_ENCODED = "Content-Type=application/x-www-form-urlencoded"
     }
 
     // Upon creation, the controller starts streaming information on new Yo states to a websocket.
@@ -40,27 +44,18 @@ class RestController(
         }
     }
 
-    @GetMapping(
-        value = "/me",
-        produces = arrayOf("text/plain"))
+    @GetMapping(value = "/me", produces = arrayOf(TEXT_PLAIN))
     override fun me(): String = super.me()
 
     /** Returns a list of the node's network peers. */
-    @GetMapping(
-        value = "/peers",
-        produces = arrayOf("application/json"))
+    @GetMapping(value = "/peers", produces = arrayOf(APP_JSON))
     override fun peers(): Map<String, List<String>> = super.peers()
 
     /** Returns a list of existing investment. */
-    @GetMapping(
-        value = "/investment",
-        produces = arrayOf("application/json"))
+    @GetMapping(value = "/investment", produces = arrayOf(APP_JSON))
     override fun investment(): List<Map<String, String>> = super.investment()
 
-    /** Invest a property from a counterparty. */
-    @PostMapping(
-        value = "/invest",
-        produces = arrayOf("text/plain"),
-        headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    /** Invest a estate from a counterparty. */
+    @PostMapping(value = "/invest", produces = arrayOf(TEXT_PLAIN), headers = arrayOf(URL_ENCODED))
     override fun invest(request: HttpServletRequest): ResponseEntity<String> = super.invest(request)
 }

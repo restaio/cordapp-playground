@@ -16,17 +16,15 @@ open class Server {
         private lateinit var app: ConfigurableApplicationContext
 
         /** Starts our Spring Boot application. */
-        @JvmStatic fun main(args: Array<String>) = launch<Server>(args) {
-            setBannerMode(OFF)
-            isWebEnvironment = true
+        @JvmStatic fun main(args: Array<String>) {
+            app = SpringApplication(Server::class.java).apply {
+                setBannerMode(OFF)
+                isWebEnvironment = true
+            }.run(*args)
         }
 
         /** For debugging purposes. */
         fun refresh() = app.refresh()
-
-        private inline fun <reified T> launch(args: Array<String>, init: SpringApplication.() -> Unit) {
-            app = SpringApplication(T::class.java).apply(init).run(*args)
-        }
     }
 
     /** Registers an endpoint for STOMP messages. */

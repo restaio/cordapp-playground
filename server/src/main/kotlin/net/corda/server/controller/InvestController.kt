@@ -19,16 +19,16 @@ interface InvestController : Controller {
 
     fun invest(request: HttpServletRequest): ResponseEntity<String> {
         val targetName = request.getParameter("target")
-        val propertyName = request.getParameter("property")
+        val estateName = request.getParameter("estate")
         val valueName = request.getParameter("value")
         requireNotNull(valueName.toIntOrNull())
         val targetX500Name = CordaX500Name.parse(targetName)
         val target = rpc.proxy.wellKnownPartyFromX500Name(targetX500Name)
             ?: throw IllegalArgumentException("Unrecognised peer.")
-        val flow = rpc.proxy.startFlowDynamic(InvestFlow::class.java, target, propertyName, valueName.toInt())
+        val flow = rpc.proxy.startFlowDynamic(InvestFlow::class.java, target, estateName, valueName.toInt())
         return try {
             flow.returnValue.getOrThrow()
-            ResponseEntity.ok("You just invest $propertyName from ${target.name} for $valueName")
+            ResponseEntity.ok("You just invest $estateName from ${target.name} for $valueName")
         } catch (e: TransactionVerificationException.ContractRejection) {
             ResponseEntity.badRequest().body("The Yo! was invalid - ${e.cause?.message}")
         }

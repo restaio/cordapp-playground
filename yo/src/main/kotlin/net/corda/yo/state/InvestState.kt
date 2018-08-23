@@ -1,6 +1,5 @@
 package net.corda.yo.state
 
-import net.corda.core.contracts.ContractState
 import net.corda.core.identity.Party
 import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
@@ -12,14 +11,24 @@ import javax.persistence.Table
 data class InvestState(
     val origin: Party,
     val target: Party,
-    val property: String,
+    val estate: String,
     val value: Int
-) : ContractState, QueryableState {
+) : QueryableState, State {
+
     override val participants get() = listOf(target)
-    override fun toString() = "${origin.name}: $property ($value)"
+
+    override fun toString() = "${origin.name}: $estate ($value)"
+
     override fun supportedSchemas() = listOf(InvestSchemaV1)
+
     override fun generateMappedObject(schema: MappedSchema) =
-        InvestSchemaV1.PersistentInvestState(origin.name.toString(), target.name.toString(), property)
+        InvestSchemaV1.PersistentInvestState(origin.name.toString(), target.name.toString(), estate)
+
+    override fun toJson(): Map<String, String> = mapOf(
+        "origin" to origin.name.organisation,
+        "target" to target.name.toString(),
+        "estate" to estate,
+        "value" to value.toString())
 
     object InvestSchema
 
@@ -31,8 +40,8 @@ data class InvestState(
             var origin: String = "",
             @Column(name = "target")
             var target: String = "",
-            @Column(name = "property")
-            var property: String = "",
+            @Column(name = "estate")
+            var estate: String = "",
             @Column(name = "value")
             var value: Int = 0
         ) : PersistentState()
