@@ -1,7 +1,5 @@
 package restaio.server.controller
 
-import restaio.server.NodeRPCConnection
-import restaio.estates.state.InvestState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -10,27 +8,30 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import restaio.estates.state.InvestState
+import restaio.server.NodeRPCConnection
 import javax.servlet.http.HttpServletRequest
 
 /**
  * A controller for interacting with the node via RPC.
  * Logic are implemented on interfaces with default functions.
  */
+@Suppress("unused")
 @RestController
 @RequestMapping("/estates")
-class RestController(
+class ApiController(
     override val rpc: NodeRPCConnection,
     override val template: SimpMessagingTemplate,
     @Value("\${$NAME}") override val controllerName: String
 ) : InvestController {
 
-    private companion object {
-        const val NAME = "config.controller.name"
+    companion object {
         val logger = LoggerFactory.getLogger(RestController::class.java)
 
-        const val TEXT_PLAIN = "text/plain"
-        const val APP_JSON = "application/json"
-        const val URL_ENCODED = "Content-Type=application/x-www-form-urlencoded"
+        private const val NAME = "config.controller.name"
+        private const val TEXT_PLAIN = "text/plain"
+        private const val APP_JSON = "application/json"
+        private const val URL_ENCODED = "Content-Type=application/x-www-form-urlencoded"
     }
 
     // Upon creation, the controller starts streaming information on new Yo states to a websocket.
@@ -44,8 +45,8 @@ class RestController(
         }
     }
 
-    @GetMapping(value = "/me", produces = arrayOf(TEXT_PLAIN))
-    override fun me(): String = super.me()
+    @GetMapping(value = "/self", produces = arrayOf(TEXT_PLAIN))
+    override fun self(): String = super.self()
 
     /** Returns a list of the node's network peers. */
     @GetMapping(value = "/peers", produces = arrayOf(APP_JSON))

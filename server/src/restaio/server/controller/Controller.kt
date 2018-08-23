@@ -11,7 +11,7 @@ interface Controller {
 
     val controllerName: String
 
-    fun me(): String = myName.toString()
+    fun self(): String = myName.toString()
 
     fun peers(): Map<String, List<String>> {
         val nodes = rpc.proxy.networkMapSnapshot()

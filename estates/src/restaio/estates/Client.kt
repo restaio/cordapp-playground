@@ -3,8 +3,8 @@ package restaio.estates
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.utilities.NetworkHostAndPort
 import net.corda.core.utilities.loggerFor
-import restaio.estates.state.InvestState
 import org.slf4j.Logger
+import restaio.estates.state.InvestState
 
 class Client {
 

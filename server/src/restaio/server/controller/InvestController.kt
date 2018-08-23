@@ -4,9 +4,9 @@ import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.utilities.getOrThrow
+import org.springframework.http.ResponseEntity
 import restaio.estates.flow.InvestFlow
 import restaio.estates.state.InvestState
-import org.springframework.http.ResponseEntity
 import javax.servlet.http.HttpServletRequest
 
 interface InvestController : Controller {

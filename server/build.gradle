@@ -34,16 +34,23 @@ dependencies {
     cordapp project(':estates')
 }
 
-task runAServer(type: JavaExec) {
+task runInvestorServer(group: 'corda', type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'restaio.server.Server'
     environment 'server.port', '8080'
     environment 'config.rpc.port', '10006'
 }
 
-task runBServer(type: JavaExec) {
+task runDeveloperServer(group: 'corda', type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'restaio.server.Server'
     environment 'server.port', '8081'
     environment 'config.rpc.port', '10009'
+}
+
+task runRestaServer(group: 'corda', type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'restaio.server.Server'
+    environment 'server.port', '8082'
+    environment 'config.rpc.port', '10012'
 }

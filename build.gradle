@@ -1,11 +1,11 @@
 buildscript {
     ext {
+        kotlin_version = '1.2.61'
         corda_release_version = '1.0.0'
         corda_gradle_plugins_version = '1.0.0'
-        kotlin_version = '1.2.61'
+        spring_boot_version = '2.0.4.RELEASE'
         quasar_version = '0.7.6'
         junit_version = '4.12'
-        spring_boot_version = '1.5.7.RELEASE'
     }
     repositories {
         mavenLocal()
@@ -75,7 +75,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
+task deployNodes(group: 'corda', type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
     directory './build/nodes'
     networkMap 'O=Controller,L=Jakarta,C=ID'
     node {
@@ -86,7 +86,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         cordapps = ['restaio:estates:0.0.1']
     }
     node {
-        name 'O=BrokerA,L=Jakarta,C=ID'
+        name 'O=Investor,L=Jakarta,C=ID'
         advertisedServices = []
         p2pPort 10005
         rpcPort 10006
@@ -94,11 +94,27 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.restaio.estates.flow.InvestFlow']]]
     }
     node {
-        name 'O=BrokerB,L=Ulsan,C=KR'
+        name 'O=Developer,L=Ulsan,C=KR'
         advertisedServices = []
         p2pPort 10008
         rpcPort 10009
         cordapps = ['restaio:estates:0.0.1']
         rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.restaio.estates.flow.InvestFlow']]]
+    }
+    node {
+        name 'O=RESTA,L=Ulsan,C=KR'
+        advertisedServices = []
+        p2pPort 10011
+        rpcPort 10012
+        cordapps = ['restaio:estates:0.0.1']
+        rpcUsers = [[user: 'user1', password: 'test', permissions: []]]
+    }
+}
+
+task startNodes(group: 'corda', type: Exec, dependsOn: ['deployNodes']) {
+    if (com.sun.javafx.PlatformUtil.isWindows()) {
+        commandLine 'build/nodes/runnodes.bat'
+    } else {
+        commandLine './build/nodes/runnodes'
     }
 }
