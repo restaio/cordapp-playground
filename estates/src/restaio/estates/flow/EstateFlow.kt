@@ -7,28 +7,26 @@ import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
 import net.corda.core.flows.StartableByRPC
-import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
-import restaio.estates.contract.InvestContract
-import restaio.estates.state.InvestState
+import restaio.estates.contract.EstateContract
+import restaio.estates.state.EstateState
 
 @InitiatingFlow
 @StartableByRPC
-class InvestFlow(
-    val target: Party,
-    val estate: String,
+class EstateFlow(
+    val name: String,
     val value: Int
 ) : FlowLogic<SignedTransaction>() {
 
-    override val progressTracker: ProgressTracker = InvestFlow.tracker()
+    override val progressTracker: ProgressTracker = EstateFlow.tracker()
 
     companion object : FlowCompanion {
-        object CREATING : ProgressTracker.Step("Creating a new investment!")
-        object SIGNING : ProgressTracker.Step("Signing the investment!")
-        object VERIFYING : ProgressTracker.Step("Verifying the investment!")
-        object FINALISING : ProgressTracker.Step("Sending the investment!") {
+        object CREATING : ProgressTracker.Step("Creating a new estate!")
+        object SIGNING : ProgressTracker.Step("Signing the estate!")
+        object VERIFYING : ProgressTracker.Step("Verifying the estate!")
+        object FINALISING : ProgressTracker.Step("Sending the estate!") {
             override fun childProgressTracker() = FinalityFlow.tracker()
         }
 
@@ -41,9 +39,9 @@ class InvestFlow(
 
         val me = serviceHub.myInfo.legalIdentities.first()
         val notary = serviceHub.networkMapCache.notaryIdentities.single()
-        val command = Command(InvestContract.Send(), listOf(me.owningKey))
-        val state = InvestState(me, target, estate, value)
-        val stateAndContract = StateAndContract(state, InvestContract.ID)
+        val command = Command(EstateContract.Send(), listOf(me.owningKey))
+        val state = EstateState(me, name, value)
+        val stateAndContract = StateAndContract(state, EstateContract.ID)
         val utx = TransactionBuilder(notary).withItems(stateAndContract, command)
 
         progressTracker.currentStep = SIGNING

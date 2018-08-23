@@ -2,12 +2,12 @@ package restaio.server.controller
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.ResponseEntity
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import restaio.estates.state.EstateState
 import restaio.estates.state.InvestState
 import restaio.server.NodeRPCConnection
 import javax.servlet.http.HttpServletRequest
@@ -23,7 +23,7 @@ class ApiController(
     override val rpc: NodeRPCConnection,
     override val template: SimpMessagingTemplate,
     @Value("\${$NAME}") override val controllerName: String
-) : InvestController {
+) : InvestController, EstateController {
 
     companion object {
         val logger = LoggerFactory.getLogger(RestController::class.java)
@@ -43,20 +43,34 @@ class ApiController(
                 template.convertAndSend("/stompresponse", stateJson)
             }
         }
+        rpc.proxy.vaultTrack(EstateState::class.java).updates.subscribe { update ->
+            update.produced.forEach { (state) ->
+                val stateJson = state.data.toJson()
+                template.convertAndSend("/stompresponse", stateJson)
+            }
+        }
     }
 
     @GetMapping(value = "/self", produces = arrayOf(TEXT_PLAIN))
-    override fun self(): String = super.self()
+    override fun self() = super<InvestController>.self()
 
     /** Returns a list of the node's network peers. */
     @GetMapping(value = "/peers", produces = arrayOf(APP_JSON))
-    override fun peers(): Map<String, List<String>> = super.peers()
+    override fun peers() = super<InvestController>.peers()
 
     /** Returns a list of existing investment. */
     @GetMapping(value = "/investment", produces = arrayOf(APP_JSON))
-    override fun investment(): List<Map<String, String>> = super.investment()
+    override fun investment() = super.investment()
 
-    /** Invest a estate from a counterparty. */
+    /** Invest an estate from a counterparty. */
     @PostMapping(value = "/invest", produces = arrayOf(TEXT_PLAIN), headers = arrayOf(URL_ENCODED))
-    override fun invest(request: HttpServletRequest): ResponseEntity<String> = super.invest(request)
+    override fun invest(request: HttpServletRequest) = super.invest(request)
+
+    /** Returns a list of existing estates. */
+    @GetMapping(value = "/list", produces = arrayOf(APP_JSON))
+    override fun list() = super.list()
+
+    /** Add an estate. */
+    @PostMapping(value = "/add", produces = arrayOf(TEXT_PLAIN), headers = arrayOf(URL_ENCODED))
+    override fun add(request: HttpServletRequest) = super.add(request)
 }

@@ -91,7 +91,10 @@ task deployNodes(group: 'corda', type: net.corda.plugins.Cordform, dependsOn: ['
         p2pPort 10005
         rpcPort 10006
         cordapps = ['restaio:estates:0.0.1']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.restaio.estates.flow.InvestFlow']]]
+        rpcUsers = [[user: 'user1', password: 'test', permissions: [
+                'StartFlow.restaio.estates.flow.EstateFlow',
+                'StartFlow.restaio.estates.flow.InvestFlow'
+        ]]]
     }
     node {
         name 'O=Developer,L=Ulsan,C=KR'
@@ -99,7 +102,10 @@ task deployNodes(group: 'corda', type: net.corda.plugins.Cordform, dependsOn: ['
         p2pPort 10008
         rpcPort 10009
         cordapps = ['restaio:estates:0.0.1']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.restaio.estates.flow.InvestFlow']]]
+        rpcUsers = [[user: 'user1', password: 'test', permissions: [
+                'StartFlow.restaio.estates.flow.EstateFlow',
+                'StartFlow.restaio.estates.flow.InvestFlow'
+        ]]]
     }
     node {
         name 'O=RESTA,L=Ulsan,C=KR'
@@ -107,7 +113,9 @@ task deployNodes(group: 'corda', type: net.corda.plugins.Cordform, dependsOn: ['
         p2pPort 10011
         rpcPort 10012
         cordapps = ['restaio:estates:0.0.1']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: []]]
+        rpcUsers = [[user: 'user1', password: 'test', permissions: [
+                'StartFlow.restaio.estates.flow.EstateFlow'
+        ]]]
     }
 }
 

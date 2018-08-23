@@ -15,14 +15,14 @@ data class InvestState(
     val value: Int
 ) : QueryableState, State {
 
-    override val participants get() = listOf(target)
+    override val participants: List<Party> get() = listOf(target)
 
     override fun toString() = "${origin.name}: $estate ($value)"
 
     override fun supportedSchemas() = listOf(InvestSchemaV1)
 
-    override fun generateMappedObject(schema: MappedSchema) =
-        InvestSchemaV1.PersistentInvestState(origin.name.toString(), target.name.toString(), estate)
+    override fun generateMappedObject(schema: MappedSchema) = InvestSchemaV1.PersistentInvestState(
+        origin.name.toString(), target.name.toString(), estate)
 
     override fun toJson(): Map<String, String> = mapOf(
         "origin" to origin.name.organisation,
@@ -36,14 +36,10 @@ data class InvestState(
         @Entity
         @Table(name = "investment")
         class PersistentInvestState(
-            @Column(name = "origin")
-            var origin: String = "",
-            @Column(name = "target")
-            var target: String = "",
-            @Column(name = "estate")
-            var estate: String = "",
-            @Column(name = "value")
-            var value: Int = 0
+            @Column(name = "origin") var origin: String = "",
+            @Column(name = "target") var target: String = "",
+            @Column(name = "estate") var estate: String = "",
+            @Column(name = "value") var value: Int = 0
         ) : PersistentState()
     }
 }

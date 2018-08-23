@@ -4,7 +4,6 @@ import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.utilities.NetworkHostAndPort
 import net.corda.core.utilities.loggerFor
 import org.slf4j.Logger
-import restaio.estates.state.InvestState
 
 class Client {
 
@@ -23,7 +22,7 @@ class Client {
             // Log the existing Yo's and listen for new ones.
             futureTransactions.startWith(transactions).toBlocking().subscribe { transaction ->
                 transaction.tx.outputs.forEach { output ->
-                    val state = output.data as InvestState
+                    val state = output.data // as InvestState
                     Client.logger.info(state.toString())
                 }
             }
