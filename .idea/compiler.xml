@@ -15,8 +15,6 @@
       <module name="corda-fx-adapter_test" target="1.8" />
       <module name="corda-spring_main" target="1.8" />
       <module name="corda-spring_test" target="1.8" />
-      <module name="cordapp-playground_main" target="1.8" />
-      <module name="cordapp-playground_test" target="1.8" />
       <module name="cordapp_main" target="1.8" />
       <module name="cordapp_test" target="1.8" />
       <module name="domain_main" target="1.8" />
@@ -31,8 +29,6 @@
       <module name="seller-api_test" target="1.8" />
       <module name="seller_main" target="1.8" />
       <module name="seller_test" target="1.8" />
-      <module name="server_main" target="1.8" />
-      <module name="server_test" target="1.8" />
       <module name="service_main" target="1.8" />
       <module name="service_test" target="1.8" />
       <module name="shared_main" target="1.8" />
@@ -47,8 +43,6 @@
       <module name="web-server-ktor_test" target="1.8" />
       <module name="web-server-spring-boot_main" target="1.8" />
       <module name="web-server-spring-boot_test" target="1.8" />
-      <module name="yo_main" target="1.8" />
-      <module name="yo_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

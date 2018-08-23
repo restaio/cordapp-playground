@@ -9,7 +9,7 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
 
-data class PurchaseState(
+data class InvestState(
     val origin: Party,
     val target: Party,
     val property: String,
@@ -17,16 +17,16 @@ data class PurchaseState(
 ) : ContractState, QueryableState {
     override val participants get() = listOf(target)
     override fun toString() = "${origin.name}: $property ($value)"
-    override fun supportedSchemas() = listOf(PurchaseSchemaV1)
+    override fun supportedSchemas() = listOf(InvestSchemaV1)
     override fun generateMappedObject(schema: MappedSchema) =
-        PurchaseSchemaV1.PersistentPurchaseState(origin.name.toString(), target.name.toString(), property)
+        InvestSchemaV1.PersistentInvestState(origin.name.toString(), target.name.toString(), property)
 
-    object PurchaseSchema
+    object InvestSchema
 
-    object PurchaseSchemaV1 : MappedSchema(PurchaseSchema.javaClass, 1, listOf(PersistentPurchaseState::class.java)) {
+    object InvestSchemaV1 : MappedSchema(InvestSchema.javaClass, 1, listOf(PersistentInvestState::class.java)) {
         @Entity
-        @Table(name = "purchases")
-        class PersistentPurchaseState(
+        @Table(name = "investment")
+        class PersistentInvestState(
             @Column(name = "origin")
             var origin: String = "",
             @Column(name = "target")

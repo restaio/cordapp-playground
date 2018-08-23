@@ -44,12 +44,12 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
         });
     })();
 
-    // Opens the purchase modal.
+    // Opens the invest modal.
     yoApp.openPurchaseModal = function openPurchaseModal() {
         $uibModal.open({
             templateUrl: "yoAppModal.html",
-            controller: "PurchaseModalController",
-            controllerAs: "purchaseModal",
+            controller: "InvestModalController",
+            controllerAs: "investModal",
             resolve: {
                 peers: () => peers
             }
@@ -69,14 +69,14 @@ app.controller("YoAppController", function($scope, $http, $location, $uibModal) 
     purchases();
 });
 
-// Controller for purchase modal.
-app.controller("PurchaseModalController", function ($http, $location, $uibModalInstance, $uibModal, peers) {
+// Controller for invest modal.
+app.controller("InvestModalController", function ($http, $location, $uibModalInstance, $uibModal, peers) {
     const modalInstance = this;
     modalInstance.peers = peers;
     modalInstance.form = {};
     modalInstance.formError = false;
 
-    // Validates and purchase.
+    // Validates and invest.
     modalInstance.create = function validateAndPurchase() {
         if (isFormInvalid()) {
             modalInstance.formError = true;
@@ -94,7 +94,7 @@ app.controller("PurchaseModalController", function ($http, $location, $uibModalI
                 }
             };
 
-            // Purchase and handles success / fail responses.
+            // Purchase and handles success / fail invest.
             $http.post(PATH_PURCHASE, purchaseData, purchaseHeaders).then(
                 modalInstance.displayMessage,
                 modalInstance.displayMessage

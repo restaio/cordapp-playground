@@ -28,6 +28,14 @@ allprojects {
         maven { url 'https://jitpack.io' }
         maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
     }
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            languageVersion = '1.1'
+            apiVersion = '1.1'
+            jvmTarget = '1.8'
+            javaParameters = true   // Useful for reflection.
+        }
+    }
 }
 
 repositories {
@@ -83,7 +91,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10005
         rpcPort 10006
         cordapps = ['com.github.roger3cev:yo:4']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.net.corda.yo.flow.PurchaseFlow']]]
+        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.net.corda.yo.flow.InvestFlow']]]
     }
     node {
         name 'O=BrokerB,L=Ulsan,C=KR'
@@ -91,6 +99,6 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         p2pPort 10008
         rpcPort 10009
         cordapps = ['com.github.roger3cev:yo:4']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.net.corda.yo.flow.PurchaseFlow']]]
+        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.net.corda.yo.flow.InvestFlow']]]
     }
 }

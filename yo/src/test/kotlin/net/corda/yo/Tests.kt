@@ -17,9 +17,9 @@ import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetwork.MockNode
 import net.corda.testing.setCordappPackages
 import net.corda.testing.unsetCordappPackages
-import net.corda.yo.contract.PurchaseContract
-import net.corda.yo.flow.PurchaseFlow
-import net.corda.yo.state.PurchaseState
+import net.corda.yo.contract.InvestContract
+import net.corda.yo.flow.InvestFlow
+import net.corda.yo.state.InvestState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +28,7 @@ import kotlin.test.assertEquals
 const val TEST_PROPERTY = "Test"
 const val TEST_VALUE = 1234
 
-class PurchaseFlowTests {
+class InvestFlowTests {
     lateinit var net: MockNetwork
     lateinit var a: StartedNode<MockNode>
     lateinit var b: StartedNode<MockNode>
@@ -51,8 +51,8 @@ class PurchaseFlowTests {
 
     @Test
     fun flowWorksCorrectly() {
-        val yo = PurchaseState(a.info.legalIdentities.first(), b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
-        val flow = PurchaseFlow(b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
+        val yo = InvestState(a.info.legalIdentities.first(), b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
+        val flow = InvestFlow(b.info.legalIdentities.first(), TEST_PROPERTY, TEST_VALUE)
         val future = a.services.startFlow(flow).resultFuture
         net.runNetwork()
         val stx = future.getOrThrow()
@@ -63,20 +63,20 @@ class PurchaseFlowTests {
         // Check yo state is stored in the vault.
         b.database.transaction {
             // Simple query.
-            val bYo = b.services.vaultService.queryBy<PurchaseState>().states.single().state.data
+            val bYo = b.services.vaultService.queryBy<InvestState>().states.single().state.data
             assertEquals(bYo.toString(), yo.toString())
             print("$bYo == $yo\n")
             // Using a custom criteria directly referencing schema entity attribute.
-            val expression = builder { PurchaseState.PurchaseSchemaV1.PersistentPurchaseState::property.equal("Test") }
+            val expression = builder { InvestState.InvestSchemaV1.PersistentInvestState::property.equal("Test") }
             val customQuery = VaultCustomQueryCriteria(expression)
-            val bYo2 = b.services.vaultService.queryBy<PurchaseState>(customQuery).states.single().state.data
+            val bYo2 = b.services.vaultService.queryBy<InvestState>(customQuery).states.single().state.data
             assertEquals(bYo2.property, yo.property)
             print("$bYo2 == $yo\n")
         }
     }
 }
 
-class PurchaseContractTests {
+class InvestContractTests {
     @Before
     fun setup() {
         setCordappPackages("net.corda.yo", "net.corda.testing.contracts")
@@ -90,37 +90,37 @@ class PurchaseContractTests {
     // @Test
     fun yoTransactionMustBeWellFormed() {
         // A pre-made Yo to Bob.
-        val yo = PurchaseState(ALICE, BOB, TEST_PROPERTY, TEST_VALUE)
+        val yo = InvestState(ALICE, BOB, TEST_PROPERTY, TEST_VALUE)
         // Tests.
         ledger {
             // Input state present.
             transaction {
                 input(DUMMY_PROGRAM_ID) { DummyState() }
-                command(ALICE_PUBKEY) { PurchaseContract.Send() }
-                output(PurchaseContract.ID) { yo }
+                command(ALICE_PUBKEY) { InvestContract.Send() }
+                output(InvestContract.ID) { yo }
                 this.failsWith("There can be no inputs when Yo'ing other parties.")
             }
             // Wrong command.
             transaction {
-                output(PurchaseContract.ID) { yo }
+                output(InvestContract.ID) { yo }
                 command(ALICE_PUBKEY) { DummyCommandData }
                 this.failsWith("")
             }
             // Command signed by wrong key.
             transaction {
-                output(PurchaseContract.ID) { yo }
-                command(MINI_CORP_PUBKEY) { PurchaseContract.Send() }
+                output(InvestContract.ID) { yo }
+                command(MINI_CORP_PUBKEY) { InvestContract.Send() }
                 this.failsWith("The Yo! must be signed by the sender.")
             }
             // Purchasing from yourself is not allowed.
             transaction {
-                output(PurchaseContract.ID) { PurchaseState(ALICE, ALICE, TEST_PROPERTY, TEST_VALUE) }
-                command(ALICE_PUBKEY) { PurchaseContract.Send() }
+                output(InvestContract.ID) { InvestState(ALICE, ALICE, TEST_PROPERTY, TEST_VALUE) }
+                command(ALICE_PUBKEY) { InvestContract.Send() }
                 this.failsWith("No sending Yo's to yourself!")
             }
             transaction {
-                output(PurchaseContract.ID) { yo }
-                command(ALICE_PUBKEY) { PurchaseContract.Send() }
+                output(InvestContract.ID) { yo }
+                command(ALICE_PUBKEY) { InvestContract.Send() }
                 this.verifies()
             }
         }

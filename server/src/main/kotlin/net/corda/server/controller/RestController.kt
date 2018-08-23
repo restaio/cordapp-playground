@@ -1,7 +1,7 @@
 package net.corda.server.controller
 
 import net.corda.server.NodeRPCConnection
-import net.corda.yo.state.PurchaseState
+import net.corda.yo.state.InvestState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -12,14 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
-/** A controller for interacting with the node via RPC. */
+/**
+ * A controller for interacting with the node via RPC.
+ * Logic are implemented on interfaces with default functions.
+ */
 @RestController
-@RequestMapping("/property") // The paths for GET and POST requests are relative to this base path.
+@RequestMapping("/property")
 class RestController(
     override val rpc: NodeRPCConnection,
     override val template: SimpMessagingTemplate,
     @Value("\${$NAME}") override val controllerName: String
-) : PurchaseController, InvestController {
+) : InvestController {
 
     companion object {
         private const val NAME = "config.controller.name"
@@ -29,7 +32,7 @@ class RestController(
     // Upon creation, the controller starts streaming information on new Yo states to a websocket.
     // The front-end can subscribe to this websocket to be notified of updates.
     init {
-        rpc.proxy.vaultTrack(PurchaseState::class.java).updates.subscribe { update ->
+        rpc.proxy.vaultTrack(InvestState::class.java).updates.subscribe { update ->
             update.produced.forEach { (state) ->
                 val yoStateJson = state.data.toJson()
                 template.convertAndSend("/stompresponse", yoStateJson)
@@ -40,24 +43,24 @@ class RestController(
     @GetMapping(
         value = "/me",
         produces = arrayOf("text/plain"))
-    override fun me(): String = super<PurchaseController>.me()
+    override fun me(): String = super.me()
 
     /** Returns a list of the node's network peers. */
     @GetMapping(
         value = "/peers",
         produces = arrayOf("application/json"))
-    override fun peers(): Map<String, List<String>> = super<PurchaseController>.peers()
+    override fun peers(): Map<String, List<String>> = super.peers()
 
-    /** Returns a list of existing purchases. */
+    /** Returns a list of existing investment. */
     @GetMapping(
-        value = "/purchases",
+        value = "/investment",
         produces = arrayOf("application/json"))
-    override fun purchases(): List<Map<String, String>> = super.purchases()
+    override fun investment(): List<Map<String, String>> = super.investment()
 
-    /** Purchase a property from a counterparty. */
+    /** Invest a property from a counterparty. */
     @PostMapping(
-        value = "/purchase",
+        value = "/invest",
         produces = arrayOf("text/plain"),
         headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
-    override fun purchase(request: HttpServletRequest): ResponseEntity<String> = super.purchase(request)
+    override fun invest(request: HttpServletRequest): ResponseEntity<String> = super.invest(request)
 }

@@ -21,7 +21,7 @@
         <div class="navbar-header">
             <a class="navbar-brand" href="#">{{yoApp.me}}</a>
         </div>
-        <button ng-click="yoApp.openPurchaseModal()" type="button" class="btn btn-primary navbar-btn">Purchase!</button>
+        <button ng-click="yoApp.openInvestModal()" type="button" class="btn btn-primary navbar-btn">Purchase!</button>
     </div>
 </nav>
 
@@ -33,11 +33,11 @@
         <div class="modal-body">
             <div class="form-group">
                 <label for="target" class="control-label">Peer:</label>
-                <select ng-model="purchaseModal.form.target" class="form-control" id="target"
-                        ng-options="peer as peer for peer in purchaseModal.peers">
+                <select ng-model="investModal.form.target" class="form-control" id="target"
+                        ng-options="peer as peer for peer in investModal.peers">
                 </select>
             </div>
-            <div ng-show="purchaseModal.formError" class="form-group">
+            <div ng-show="investModal.formError" class="form-group">
                 <div class="alert alert-danger" role="alert">
                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                     <span class="sr-only">Error:</span>
@@ -46,8 +46,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button ng-click="purchaseModal.cancel()" type="button" class="btn btn-default">Close</button>
-            <button ng-click="purchaseModal.create()" type="button" class="btn btn-primary">Purchase!</button>
+            <button ng-click="investModal.cancel()" type="button" class="btn btn-default">Close</button>
+            <button ng-click="investModal.create()" type="button" class="btn btn-primary">Purchase!</button>
         </div>
     </form>
 </script>
