@@ -1,5 +1,5 @@
-group 'com.github.roger3cev'
-version '4'
+group 'restaio'
+version '0.0.1'
 
 apply plugin: 'kotlin'
 apply plugin: 'net.corda.plugins.cordformation'

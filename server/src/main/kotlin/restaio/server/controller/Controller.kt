@@ -1,6 +1,6 @@
-package net.corda.server.controller
+package restaio.server.controller
 
-import net.corda.server.NodeRPCConnection
+import restaio.server.NodeRPCConnection
 import org.springframework.messaging.simp.SimpMessagingTemplate
 
 interface Controller {

@@ -1,4 +1,4 @@
-package net.corda.yo.state
+package restaio.estates.state
 
 import net.corda.core.identity.Party
 import net.corda.core.schemas.MappedSchema

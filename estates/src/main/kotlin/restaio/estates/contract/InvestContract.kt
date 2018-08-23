@@ -1,16 +1,16 @@
-package net.corda.yo.contract
+package restaio.estates.contract
 
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.contracts.requireSingleCommand
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
-import net.corda.yo.state.InvestState
+import restaio.estates.state.InvestState
 
 class InvestContract : Contract {
 
     companion object {
-        const val ID = "net.corda.yo.contract.InvestContract"
+        const val ID = "restaio.estates.contract.InvestContract"
     }
 
     // Command.

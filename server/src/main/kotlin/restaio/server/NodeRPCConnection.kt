@@ -1,4 +1,4 @@
-package net.corda.server
+package restaio.server
 
 import net.corda.client.rpc.CordaRPCClient
 import net.corda.core.messaging.CordaRPCOps
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component
  * @param rpcPort The RPC port of the node we are connecting to.
  * @param username The username for logging into the RPC client.
  * @param password The password for logging into the RPC client.
- * @estate proxy The RPC proxy.
  */
 @Component
 open class NodeRPCConnection(
@@ -32,6 +31,7 @@ open class NodeRPCConnection(
         const val CORDA_RPC_PORT = "config.rpc.port"
     }
 
+    /** The RPC proxy. */
     val proxy: CordaRPCOps
 
     init {

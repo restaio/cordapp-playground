@@ -1,4 +1,4 @@
-package net.corda.server
+package restaio.server
 
 import org.springframework.boot.Banner.Mode.OFF
 import org.springframework.boot.SpringApplication

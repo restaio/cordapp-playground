@@ -1,3 +1,6 @@
+group 'restaio'
+version '0.0.1'
+
 apply plugin: 'kotlin'
 apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
@@ -23,19 +26,19 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-log4j2:$spring_boot_version"
     compile "org.apache.logging.log4j:log4j-web:2.7"
 
-    cordapp project(':yo')
+    cordapp project(':estates')
 }
 
 task runAServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'net.corda.server.Server'
+    main = 'restaio.server.Server'
     environment 'server.port', '8080'
     environment 'config.rpc.port', '10006'
 }
 
 task runBServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'net.corda.server.Server'
+    main = 'restaio.server.Server'
     environment 'server.port', '8081'
     environment 'config.rpc.port', '10009'
 }

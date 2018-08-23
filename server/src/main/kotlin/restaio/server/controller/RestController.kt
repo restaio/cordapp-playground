@@ -1,7 +1,7 @@
-package net.corda.server.controller
+package restaio.server.controller
 
-import net.corda.server.NodeRPCConnection
-import net.corda.yo.state.InvestState
+import restaio.server.NodeRPCConnection
+import restaio.estates.state.InvestState
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -38,8 +38,8 @@ class RestController(
     init {
         rpc.proxy.vaultTrack(InvestState::class.java).updates.subscribe { update ->
             update.produced.forEach { (state) ->
-                val yoStateJson = state.data.toJson()
-                template.convertAndSend("/stompresponse", yoStateJson)
+                val stateJson = state.data.toJson()
+                template.convertAndSend("/stompresponse", stateJson)
             }
         }
     }

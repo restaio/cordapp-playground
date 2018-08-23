@@ -1,4 +1,4 @@
-package net.corda.yo
+package restaio.estates
 
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria.VaultCustomQueryCriteria
@@ -17,9 +17,9 @@ import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetwork.MockNode
 import net.corda.testing.setCordappPackages
 import net.corda.testing.unsetCordappPackages
-import net.corda.yo.contract.InvestContract
-import net.corda.yo.flow.InvestFlow
-import net.corda.yo.state.InvestState
+import restaio.estates.contract.InvestContract
+import restaio.estates.flow.InvestFlow
+import restaio.estates.state.InvestState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -35,7 +35,7 @@ class InvestFlowTests {
 
     @Before
     fun setup() {
-        setCordappPackages("net.corda.yo")
+        setCordappPackages("restaio.estates")
         net = MockNetwork()
         val nodes = net.createSomeNodes(2)
         a = nodes.partyNodes[0]
@@ -79,7 +79,7 @@ class InvestFlowTests {
 class InvestContractTests {
     @Before
     fun setup() {
-        setCordappPackages("net.corda.yo", "net.corda.testing.contracts")
+        setCordappPackages("restaio.estates", "net.corda.testing.contracts")
     }
 
     @After

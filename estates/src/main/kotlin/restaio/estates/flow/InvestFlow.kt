@@ -1,4 +1,4 @@
-package net.corda.yo.flow
+package restaio.estates.flow
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.Command
@@ -11,8 +11,8 @@ import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
-import net.corda.yo.contract.InvestContract
-import net.corda.yo.state.InvestState
+import restaio.estates.contract.InvestContract
+import restaio.estates.state.InvestState
 
 @InitiatingFlow
 @StartableByRPC

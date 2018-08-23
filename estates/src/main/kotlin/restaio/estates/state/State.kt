@@ -1,4 +1,4 @@
-package net.corda.yo.state
+package restaio.estates.state
 
 interface State {
 

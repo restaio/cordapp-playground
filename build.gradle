@@ -63,7 +63,7 @@ dependencies {
     cordaRuntime "net.corda:corda:$corda_release_version"
     testCompile "net.corda:corda-node-driver:$corda_release_version"
 
-    cordapp project(':yo')
+    cordapp project(':estates')
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -83,22 +83,22 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         advertisedServices = ['corda.notary.validating']
         p2pPort 10002
         rpcPort 10003
-        cordapps = ['com.github.roger3cev:yo:4']
+        cordapps = ['restaio:estates:0.0.1']
     }
     node {
         name 'O=BrokerA,L=Jakarta,C=ID'
         advertisedServices = []
         p2pPort 10005
         rpcPort 10006
-        cordapps = ['com.github.roger3cev:yo:4']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.net.corda.yo.flow.InvestFlow']]]
+        cordapps = ['restaio:estates:0.0.1']
+        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.restaio.estates.flow.InvestFlow']]]
     }
     node {
         name 'O=BrokerB,L=Ulsan,C=KR'
         advertisedServices = []
         p2pPort 10008
         rpcPort 10009
-        cordapps = ['com.github.roger3cev:yo:4']
-        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.net.corda.yo.flow.InvestFlow']]]
+        cordapps = ['restaio:estates:0.0.1']
+        rpcUsers = [[user: 'user1', password: 'test', permissions: ['StartFlow.restaio.estates.flow.InvestFlow']]]
     }
 }
