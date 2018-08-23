@@ -17,12 +17,12 @@ import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetwork.MockNode
 import net.corda.testing.setCordappPackages
 import net.corda.testing.unsetCordappPackages
-import restaio.estates.contract.InvestContract
-import restaio.estates.flow.InvestFlow
-import restaio.estates.state.InvestState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import restaio.estates.contract.InvestContract
+import restaio.estates.flow.InvestFlow
+import restaio.estates.state.InvestState
 import kotlin.test.assertEquals
 
 const val TEST_ESTATE = "Test"
@@ -33,8 +33,7 @@ class InvestFlowTests {
     lateinit var a: StartedNode<MockNode>
     lateinit var b: StartedNode<MockNode>
 
-    @Before
-    fun setup() {
+    @Before fun setup() {
         setCordappPackages("restaio.estates")
         net = MockNetwork()
         val nodes = net.createSomeNodes(2)
@@ -43,14 +42,12 @@ class InvestFlowTests {
         net.runNetwork()
     }
 
-    @After
-    fun tearDown() {
+    @After fun tearDown() {
         unsetCordappPackages()
         net.stopNodes()
     }
 
-    @Test
-    fun flowWorksCorrectly() {
+    @Test fun flowWorksCorrectly() {
         val yo = InvestState(a.info.legalIdentities.first(), b.info.legalIdentities.first(), TEST_ESTATE, TEST_VALUE)
         val flow = InvestFlow(b.info.legalIdentities.first(), TEST_ESTATE, TEST_VALUE)
         val future = a.services.startFlow(flow).resultFuture
@@ -77,13 +74,11 @@ class InvestFlowTests {
 }
 
 class InvestContractTests {
-    @Before
-    fun setup() {
+    @Before fun setup() {
         setCordappPackages("restaio.estates", "net.corda.testing.contracts")
     }
 
-    @After
-    fun tearDown() {
+    @After fun tearDown() {
         unsetCordappPackages()
     }
 
